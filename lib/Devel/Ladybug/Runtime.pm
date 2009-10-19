@@ -32,7 +32,7 @@ sub import {
 dbPass: ~
 dbHost: localhost
 dbPort: ~
-dbUser: op
+dbUser: ladybug
 memcachedHosts: 
   - 127.0.0.1:31337
 rcsBindir: /usr/bin
@@ -51,6 +51,7 @@ yamlHost: ~
 
   $Backends->{"SQLite"} =
     Devel::Ladybug::Persistence::__supportsSQLite();
+
   $Backends->{"MySQL"} = Devel::Ladybug::Persistence::__supportsMySQL();
 
   if ( !$Backends->{"MySQL"} ) {
@@ -61,11 +62,11 @@ yamlHost: ~
     print
 "the issue shown in the diagnostic message below. You will need\n";
     print
-      "to create a local MySQL DB named 'op', and grant access, ie:\n";
+      "to create a local MySQL DB named 'ladybug', and grant access, ie:\n";
     print "\n";
     print "> mysql -u root -p\n";
-    print "> create database op;\n";
-    print "> grant all on op.* to op\@localhost;\n";
+    print "> create database ladybug;\n";
+    print "> grant all on ladybug.* to ladybug\@localhost;\n";
 
     if ($@) {
       my $error = $@;
@@ -89,7 +90,7 @@ yamlHost: ~
     print
 "the issue shown in the diagnostic message below. You will need\n";
     print
-"to create a local pgsql DB and user named 'op' + grant access.\n";
+"to create a local pgsql DB and user named 'ladybug' + grant access.\n";
     print "\n";
 
     if ($@) {

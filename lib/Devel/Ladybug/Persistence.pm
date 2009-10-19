@@ -690,8 +690,18 @@ lower-cased first-level Perl namespace, unless overridden in subclass.
 sub databaseName {
   my $class = shift;
 
-  my $dbName = lc($class);
-  $dbName =~ s/:.*//;
+  my $dbName = $class->get("__databaseName");
+
+  if ( !$dbName ) {
+    if ( $class =~ /Devel::Ladybug::/ ) {
+      $dbName = 'ladybug';
+    } else {
+      $dbName = lc($class);
+      $dbName =~ s/:.*//;
+    }
+
+    $class->set("__databaseName", $dbName);
+  }
 
   return $dbName;
 }
@@ -730,7 +740,13 @@ sub tableName {
 
   if ( !$tableName ) {
     $tableName = lc($class);
-    $tableName =~ s/.*?:://;
+
+    if ( $class =~ /Devel::Ladybug::/ ) {
+      $tableName =~ s/Devel::Ladybug:://;
+    } else {
+      $tableName =~ s/.*?:://;
+    }
+
     $tableName =~ s/::/_/g;
 
     $class->set( "__tableName", $tableName );
@@ -1269,7 +1285,7 @@ sub __supportsMySQL {
   eval {
     require DBD::mysql;
 
-    my $dbname = 'op';
+    my $dbname = 'ladybug';
 
     my $dsn = sprintf( 'DBI:mysql:database=%s;host=%s;port=%s',
       $dbname, dbHost, dbPort || 3306 );
@@ -1293,7 +1309,7 @@ sub __supportsPostgreSQL {
   eval {
     require DBD::Pg;
 
-    my $dbname = 'op';
+    my $dbname = 'ladybug';
 
     my $dsn = sprintf( 'DBI:Pg:database=%s;host=%s;port=%s',
       $dbname, dbHost, dbPort || 5432 );

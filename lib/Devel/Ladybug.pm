@@ -79,7 +79,7 @@ __END__
 
 =head1 NAME
 
-Devel::Ladybug - Compact schema prototyping (formerly OP)
+Devel::Ladybug - Compact schema prototyping (formerly "OP")
 
 =head1 SYNOPSIS
 
@@ -534,16 +534,9 @@ L<Devel::Ladybug::Class>
 
 Devel::Ladybug is on GitHub: http://github.com/aayars/ladybug
 
-=head1 POSTAMBLE
+=head1 SUPPORT
 
-Devel::Ladybug was specifically written as an object persistence layer.
-Its purpose is focused to the task of letting developers save and
-retrieve objects to/from a backing store without incurring a lot of
-legwork, and its usage reflects this.
-
-Thanks to all who have provided feedback and testing. My aim is to make
-this software as good and as useful as possible. I welcome suggestions,
-contributions, and input.
+Support is available from the author via email.
 
 =head1 AUTHOR
 
