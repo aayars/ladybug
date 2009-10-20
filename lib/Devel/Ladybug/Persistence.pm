@@ -1418,6 +1418,8 @@ To override the base path in subclass if needed:
 sub __basePath {
   my $class = shift;
 
+  $class =~ s/::/\//g;
+
   return join( '/', yamlRoot, $class );
 }
 

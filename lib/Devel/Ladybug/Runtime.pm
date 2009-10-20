@@ -39,7 +39,6 @@ rcsBindir: /usr/bin
 rcsDir: RCS
 scratchRoot: $path/scratch
 sqliteRoot: $path/sqlite
-syslogHost: ~
 yamlRoot: $path/yaml
 yamlHost: ~
 |;

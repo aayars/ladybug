@@ -52,7 +52,6 @@ sub main {
       memcachedHosts => [ '127.0.0.1:31337', ],
       rcsBindir      => '/usr/bin',
       rcsDir         => 'RCS',
-      syslogHost     => undef,
     };
 
     open( CONF, ">", $path ) || die $!;

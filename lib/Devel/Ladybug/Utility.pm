@@ -39,22 +39,12 @@ use Data::GUID;
 use Error qw| :try |;
 use File::Path;
 use IO::File;
-use Net::Syslog;
 use POSIX qw| strftime |;
 use Scalar::Util qw| blessed |;
 use YAML::Syck;
 
-use Devel::Ladybug::Constants qw| yamlRoot scratchRoot syslogHost |;
+use Devel::Ladybug::Constants qw| yamlRoot scratchRoot |;
 use Devel::Ladybug::Exceptions;
-
-my $logger =
-  syslogHost
-  ? Net::Syslog->new(
-  Facility   => 'local1',
-  Priority   => 'info',
-  SyslogHost => syslogHost,
-  )
-  : undef;
 
 our $longmess = 1;    # Carp.pm long messages - 0 = no, 1 = yes
 
@@ -365,11 +355,6 @@ sub warnHandler {
   my $errStr = "- Warning from $caller:\n  $message\n";
 
   print STDERR $errStr;
-
-  if ($logger) {
-    $errStr =~ s/\s+/ /g;
-    $logger->send($errStr);
-  }
 }
 
 =pod
@@ -428,12 +413,6 @@ sub dieHandler {
       $message
       ? join( "  ", $firstLine, formatErrorString($message) )
       : join( "  ", $firstLine, $exception );
-  }
-
-  if ($logger) {
-    my $singleLine = $errStr;
-    $singleLine =~ s/\s+/ /g;
-    $logger->send($singleLine);
   }
 
   die "$errStr";

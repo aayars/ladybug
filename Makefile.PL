@@ -1,28 +1,21 @@
 use ExtUtils::MakeMaker;
 
 my $prereqs = {
-  Cache::Memcached::Fast => 0.13,
-  Clone                  => 0.29,
-  Data::GUID             => 0.043,
-  Digest::SHA1           => 2.11,
+  Cache::Memcached::Fast => 0.16,
+  Clone                  => 0.31,
+  Data::GUID             => 0.045,
+  Digest::SHA1           => 2.12,
   Error                  => 0.17015,
-  File::Copy             => 2,
-  File::Path             => 2.04,
-  File::HomeDir::Unix    => 0.86,
+  File::HomeDir          => 0.86,
   File::Tempdir          => 0.02,
   GlobalDBI              => 0.21,
-  IO::Handle             => 1.14,
   Math::VecStat          => 0.08,
-  Net::Syslog            => 0.03,
   Rcs                    => 1.05,
-  Scalar::Util           => 1.19,
-  Sys::Hostname          => 1.11,
-  Test::More             => 0.86,
-  Time::HiRes            => 1.9711,
-  Time::Piece            => 1.12,
+  Test::Simple           => 0.94,
+  Time::Piece            => 1.12, # CPAN won't remove Darwin's older version?
   Unicode::String        => 2.09,
-  URI::Escape            => 3.29,
-  YAML::Syck             => 1.05,
+  URI                    => 1.40,
+  YAML::Syck             => 1.07,
 };
 
 WriteMakefile(

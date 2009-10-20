@@ -116,7 +116,6 @@ sub init {
       memcachedHosts => [ '127.0.0.1:31337', ],
       rcsBindir      => '/usr/bin',
       rcsDir         => 'RCS',
-      syslogHost     => undef,
     };
   } else {
     print STDERR q(!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -257,7 +256,6 @@ must be valid YAML:
     - 127.0.0.1:31337
   rcsBindir: /usr/bin
   rcsDir: RCS
-  syslogHost: ~
 
 
 =head1 HOST-SPECIFIC OVERLAYS
