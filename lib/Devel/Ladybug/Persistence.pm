@@ -2635,16 +2635,26 @@ sub __init {
   my $class = shift;
 
   if ( $class->__useRcs ) {
-    my $ci = join( '/', rcsBindir, 'ci' );
-    my $co = join( '/', rcsBindir, 'co' );
-
-    if ( !-e $ci || !-e $co ) {
+    if ( $^O eq 'openbsd' ) {
       $class->set( "__useRcs", false );
 
       if ( !$alreadyWarnedForRcs ) {
-        warn "Disabling RCS support (\"ci\"/\"co\" not found)\n";
+        warn "Disabling RCS support (OpenRCS not currently supported)\n";
 
         $alreadyWarnedForRcs++;
+      }
+    } else {
+      my $ci = join( '/', rcsBindir, 'ci' );
+      my $co = join( '/', rcsBindir, 'co' );
+
+      if ( !-e $ci || !-e $co ) {
+        $class->set( "__useRcs", false );
+
+        if ( !$alreadyWarnedForRcs ) {
+          warn "Disabling RCS support (\"ci\"/\"co\" not found)\n";
+
+          $alreadyWarnedForRcs++;
+        }
       }
     }
   }
