@@ -739,7 +739,7 @@ sub tableName {
   my $tableName = $class->get("__tableName");
 
   if ( !$tableName ) {
-    $tableName = lc($class);
+    $tableName = $class;
 
     if ( $class =~ /Devel::Ladybug::/ ) {
       $tableName =~ s/Devel::Ladybug:://;
@@ -748,6 +748,7 @@ sub tableName {
     }
 
     $tableName =~ s/::/_/g;
+    $tableName = lc($tableName);
 
     $class->set( "__tableName", $tableName );
   }
@@ -2815,8 +2816,6 @@ sub remove {
     $self->_fsDelete();
   }
 
-  $self->clear();
-
   return true;
 }
 
@@ -3385,13 +3384,6 @@ sub _localSaveInsideTransaction {
     # Initial checkout:
     #
     if ($useRcs) {
-      $rcs = Rcs->new();
-
-      $path =~ /(.*)\/(.*)/;
-
-      my $directory = $1;
-      my $filename  = $2;
-
       my $rcsBase = $class->__baseRcsPath();
 
       if ( !-d $rcsBase ) {
@@ -3401,9 +3393,7 @@ sub _localSaveInsideTransaction {
         }
       }
 
-      $rcs->file($filename);
-      $rcs->rcsdir($rcsBase);
-      $rcs->workdir($directory);
+      $rcs = $self->_rcs();
 
       $self->_checkout( $rcs, $path );
     }
