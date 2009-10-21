@@ -1,7 +1,7 @@
 .399_xxx
   - Rename project from OP to Devel::Ladybug
   - Remove deps and update dep versions
-  - RCS support on OpenBSD is known to be broken
+  - Disabled RCS support on OpenBSD for now
 
 2009-10-17: .319
   - Add support + tests for PostgreSQL

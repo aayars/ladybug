@@ -2636,6 +2636,9 @@ sub __init {
 
   if ( $class->__useRcs ) {
     if ( $^O eq 'openbsd' ) {
+      #
+      # XXX Contacted OpenRCS author re: arch dir probs, will fix this later
+      #
       $class->set( "__useRcs", false );
 
       if ( !$alreadyWarnedForRcs ) {
