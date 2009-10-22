@@ -12,12 +12,6 @@ package Devel::Ladybug::Error;
 
 use base qw| Error::Simple |;
 
-sub rethrow {
-  my $self = shift;
-
-  $self->throw(@_);
-}
-
 package Devel::Ladybug::Exceptions;
 
 use strict;
