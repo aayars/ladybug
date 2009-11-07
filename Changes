@@ -1,3 +1,6 @@
+.401
+  - Fix problem w/self-referential tables and add test case
+
 .399_xxx
   - Rename project from OP to Devel::Ladybug
   - Remove deps and update dep versions

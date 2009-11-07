@@ -194,6 +194,8 @@ use warnings;
 
 use base qw| Devel::Ladybug::Str |;
 
+# use Devel::Ladybug::ID;
+
 sub assert {
   my $class = shift;
   my @rules = @_;
@@ -205,7 +207,31 @@ sub assert {
     Devel::Ladybug::Type::__parseTypeArgs( Devel::Ladybug::Type::isStr,
     @rules );
 
-  $parsed{columnType} = $externalClass->asserts->{id}->columnType;
+  if ( UNIVERSAL::isa( $externalClass, "Devel::Ladybug::Object" ) ) {
+    #
+    # We already know what the foreign column type is, so just use
+    # the same type here:
+    #
+    $parsed{columnType} ||= $externalClass->asserts->{id}->columnType;
+
+  } else {
+    #
+    # If asserting a self-referential link from a table to itself,
+    # $externalClass won't exist yet, and this is a problem when
+    # it comes to magically determine the column type. The solution
+    # implemented below doesn't "just work" for self-ref ExtIDs which
+    # are referencing a type other than Devel::Ladybug::ID (eg
+    # Devel::Ladybug::Serial).
+    #
+    # As a workaround, callers should provide an explicit "columnType"
+    # subtype arg in these cases for now. I'm not sure how else to
+    # deal with this presently. This only happens for same-table ExtIDs
+    # in classes which do not use Devel::Ladybug::ID for their
+    # primary key, which is really an edge use case for Ladybug.
+    #
+    $parsed{columnType} ||= Devel::Ladybug::ID->assert->columnType;
+
+  }
 
   if ( $query && !ref $query ) {
     $parsed{allowed} = sub {
