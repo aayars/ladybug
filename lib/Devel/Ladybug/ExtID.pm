@@ -232,7 +232,7 @@ by the database when manually inserting or updating rows. Careful!
 
 =head1 BUGS AND LIMITATIONS
 
-=head2 Same-table non-GUID Keys
+=head2 Same-table non-GUID keys
 
 Self-referential tables whose ID is not of type L<Devel::Ladybug::ID>
 should assert an appropriate column type. This is needed because at
