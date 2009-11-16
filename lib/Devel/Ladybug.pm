@@ -11,7 +11,7 @@
 
 package Devel::Ladybug;
 
-our $VERSION = '0.402';
+our $VERSION = '0.403';
 
 use strict;
 use diagnostics;
@@ -111,7 +111,7 @@ use it in conjunction with the permanent backing store.
 
 =head1 VERSION
 
-This documentation is for version B<0.402> of Devel::Ladybug.
+This documentation is for version B<0.403> of Devel::Ladybug.
 
 =head1 EXPORT TAGS
 
@@ -495,7 +495,7 @@ directory.
 
 To generate a first-time config for the local machine, copy the
 .ladybugrc (included with this distribution as C<ladybugrc-dist>) to
-the proper location, or run C<opconf> (also included with this
+the proper location, or run C<ladybug-conf> (also included with this
 distribution) as the user who will be running Devel::Ladybug.
 
 See L<Devel::Ladybug::Constants> for information regarding customizing

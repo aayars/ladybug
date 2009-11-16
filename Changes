@@ -1,3 +1,6 @@
+.403
+  - Fix references to ladybug-conf in docs
+
 .402
   - Re-work fix for self-ref tables
 
