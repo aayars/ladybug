@@ -1,5 +1,6 @@
 .403
   - Fix references to ladybug-conf in docs
+  - Modify die() handler to not hork on non-Error objects
 
 .402
   - Re-work fix for self-ref tables
