@@ -16,6 +16,8 @@ our $VERSION = '0.403';
 use strict;
 use diagnostics;
 
+use 5.008_008; # Perl 5.8.8+
+
 #
 # Abstract classes
 #
@@ -528,6 +530,38 @@ And in your C<httpd.conf>:
 
   PerlRequire /path/to/your/startup.pl
 
+=head1 INSTALLATION AND DEPENDENCIES
+
+Ease of installation is one of Devel::Ladybug's goals. The only
+requirements are C<gcc> (or equivalent) and a modern/working Perl
+5 (5.8.8+). All other dependencies (listed in Makefile.PL) are
+handled by CPAN, and generally install with no fuss.
+
+The recommended way to install Devel::Ladybug is via CPAN:
+
+  perl -MCPAN -e 'install Devel::Ladybug'
+
+Answer "yes" when prompted to install dependencies.
+
+Devel::Ladybug does not depend on any particular DBI driver-- the
+package of your choice needs to be installed separately in order
+to be usable by Devel::Ladybug as a backing store type. These
+include: DBD::mysql, DBD::Pg, and DBD::SQLite.
+
+=head2 INSTALL PROBLEMS?
+
+The most common installation problem is due to a compiler (gcc) not
+being present on the local machine. After installing gcc, you may
+need to purge the contents of the CPAN build directory (probably
+~root/.cpan/build), and re-run the install command.
+
+Refer to recent CPAN Testers results to see if Devel::Ladybug
+"should" work with your particular software stack. Installation
+problems may be reported to the author via email (please include
+the output from C<make test>)
+
+  http://static.cpantesters.org/distro/D/Devel-Ladybug.html
+
 =head1 SEE ALSO
 
 L<Devel::Ladybug::Class>
@@ -542,7 +576,7 @@ Support is available from the author via email.
 
   Alex Ayars <pause@nodekit.org>
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
   Copyright (c) 2009 TiVo Inc.
  

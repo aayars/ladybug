@@ -1,5 +1,7 @@
 use ExtUtils::MakeMaker;
 
+require 5.008_008;
+
 my $prereqs = {
   Cache::Memcached::Fast => 0.16,
   Clone                  => 0.31,
