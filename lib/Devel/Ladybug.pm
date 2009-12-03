@@ -111,39 +111,15 @@ Devel::Ladybug will try to automatically determine an appropriate type
 for the local system. If memcached is available, Devel::Ladybug will
 use it in conjunction with the permanent backing store.
 
+=head1 TOO LONG, DIDN'T READ
+
+This document covers a lot of ground. If your sense of urgency
+is strong indeed, you may wish to read the short version at
+L<Devel::Ladybug::TLDR>.
+
 =head1 VERSION
 
 This documentation is for version B<0.403> of Devel::Ladybug.
-
-=head1 EXPORT TAGS
-
-All exports are optional. Specify a tag or symbol by name to import it
-into your caller's namespace.
-
-  use Devel::Ladybug qw| :all |;
-
-=over 4
-
-=item * :all
-
-This imports each of the symbols listed below.
-
-=item * :create
-
-This imports the C<create> and C<subtype> class prototyping functions;
-see L<Devel::Ladybug::Class>, L<Devel::Ladybug::Subtype>, and examples
-in this document.
-
-=item * :bool
-
-This imports C<true> and C<false> boolean constants.
-
-=item * :yield
-
-This imports the C<yield>, C<emit>, and C<break> functions for array
-collectors; see L<Devel::Ladybug::Array>.
-
-=back
 
 =head1 FRAMEWORK ASSUMPTIONS
 
@@ -480,6 +456,36 @@ asserted as inline attributes.
 
 =back
 
+=head1 EXPORT TAGS
+
+All exports are optional. Specify a tag or symbol by name to import it
+into your caller's namespace.
+
+  use Devel::Ladybug qw| :all |;
+
+=over 4
+
+=item * :all
+
+This imports each of the symbols listed below.
+
+=item * :create
+
+This imports the C<create> and C<subtype> class prototyping functions;
+see L<Devel::Ladybug::Class>, L<Devel::Ladybug::Subtype>, and examples
+in this document.
+
+=item * :bool
+
+This imports C<true> and C<false> boolean constants.
+
+=item * :yield
+
+This imports the C<yield>, C<emit>, and C<break> functions for array
+collectors; see L<Devel::Ladybug::Array>.
+
+=back
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head2 Devel::Ladybug and your DBA
@@ -530,30 +536,47 @@ And in your C<httpd.conf>:
 
   PerlRequire /path/to/your/startup.pl
 
-=head1 INSTALLATION AND DEPENDENCIES
+=head1 INSTALLATION
 
 Ease of installation is one of Devel::Ladybug's goals. The only
-requirements are C<gcc> (or equivalent) and a modern/working Perl
-5 (5.8.8+). All other dependencies (listed in Makefile.PL) are
-handled by CPAN, and generally install with no fuss.
+build requirements are a compiler (C<gcc> or equivalent is needed
+by CPAN to build a few dependencies), and a working Perl 5 (5.8.8
+or greater). Devel::Ladybug's prerequisite Perl packages are handled
+by CPAN, and generally install with no fuss. These are listed in
+Makefile.PL.
+
+=head2 FROM CPAN (RECOMMENDED)
 
 The recommended way to install Devel::Ladybug is via CPAN:
 
   perl -MCPAN -e 'install Devel::Ladybug'
 
-Answer "yes" when prompted to install dependencies.
+Answer "yes" when prompted to install dependencies. You must (of
+course) have permission on your local system to do so, which means
+you either have superuser access, or your user owns the Perl install.
 
 Devel::Ladybug does not depend on any particular DBI driver-- the
 package of your choice needs to be installed separately in order
-to be usable by Devel::Ladybug as a backing store type. These
-include: DBD::mysql, DBD::Pg, and DBD::SQLite.
+to be usable by Devel::Ladybug as a backing store type. Currently
+supported drivers are: L<DBD::mysql>, L<DBD::Pg>, and L<DBD::SQLite>.
+
+=head2 FROM SOURCE
+
+Assuming dependencies have been installed, installation may also
+be done manually:
+
+  cd Devel-Ladybug-xxxx
+  perl Makefile.PL # Warns if system is missing prereqs
+  make test
+  make install
 
 =head2 INSTALL PROBLEMS?
 
-The most common installation problem is due to a compiler (gcc) not
-being present on the local machine. After installing gcc, you may
-need to purge the contents of the CPAN build directory (probably
-~root/.cpan/build), and re-run the install command.
+The most common installation problem is due to a compiler not being
+present on the local machine. After installing gcc, you may need
+to purge the contents of the CPAN build directory to avoid cached
+failed build results (e.g. ~root/.cpan/build/*), and re-run the
+installation.
 
 Refer to recent CPAN Testers results to see if Devel::Ladybug
 "should" work with your particular software stack. Installation
