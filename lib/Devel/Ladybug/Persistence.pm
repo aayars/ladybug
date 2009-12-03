@@ -1291,7 +1291,6 @@ sub __supportsMySQL {
     my $dsn = sprintf( 'DBI:mysql:database=%s;host=%s;port=%s',
       $dbname, dbHost, dbPort || 3306 );
 
-    ### XXX This is wrong
     my $dbh = DBI->connect( $dsn, dbUser, dbPass, { RaiseError => 1 } )
       || die DBI->errstr;
 
