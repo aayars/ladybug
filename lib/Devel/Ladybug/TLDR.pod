@@ -26,7 +26,7 @@ Create a C<.ladybugrc> file by issuing the following command:
 
   ladybug-conf
 
-This will open a YAML document in C<vi>. Fill in the blanks, save
+This will open a YAML document in C<vim>. Fill in the blanks, save
 and quit. The rc file may also be created manually. C<ladybugrc-dist>
 is included with this distro as a reference, and the
 L<Devel::Ladybug::Constants> document contains further guidance.
@@ -54,21 +54,21 @@ a database called "yourapp".
 If the database exists and perms are in order, Devel::Ladybug will
 automatically detect and use it as a backing store.
 
-=head2 KNOW!
+=head2 KNOW
 
-Know that Devel::Ladybug creates the tables that it needs.
+Devel::Ladybug creates the tables that it needs, the database just
+needs to exist with proper access granted.
 
-Know that Devel::Ladybug automatically stores a GUID (id, see
-L<Devel::Ladybug::ID>) and creation/modify times for every object.
+Devel::Ladybug stores a GUID ("id", see L<Devel::Ladybug::ID>),
+"name" and creation/modify times for every object.
 
-Know that "name" is a pre-asserted and mandatory attribute for your
-objects, and each object's name must be unique within the class.
-This behavior may be overridden by re-asserting the name attribute
-as desired (See L<Devel::Ladybug::Name>).
+"name" is a mandatory attribute, and each object's name must be
+unique per-class. This behavior may be overridden by re-asserting
+"name" with different subtype rules (See L<Devel::Ladybug::Name>).
 
-Know that Devel::Ladybug always returns retrieved data in object
-form, but that it's okay for you to use Perl's native types in
-setters and constructors.
+Devel::Ladybug always returns retrieved data in object form, but
+it's okay to use Perl's native types in setters, constructors and
+other operations.
 
 See the "FRAMEWORK ASSUMPTIONS" section in the C<Devel::Ladybug>
 document for further guidance.
@@ -96,7 +96,7 @@ illustrates basic usage:
 =head3 STORAGE
 
   #
-  # File: somecaller.pl
+  # File: yoursetter
   #
   use strict;
   use warnings;
@@ -113,7 +113,7 @@ illustrates basic usage:
 =head3 RETRIEVAL
 
   #
-  # File: someothercaller.pl
+  # File: yourgetter
   #
   use strict;
   use warnings;
