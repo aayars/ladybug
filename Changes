@@ -1,8 +1,9 @@
 .403
   - Fix references to ladybug-conf in docs
   - Modify die() handler to not hork on non-Error objects
-  - Require 5.8.8+ in Makefile and Ladybug.pm
+  - Require 5.8.8+ in Makefile.PL and Ladybug.pm
   - Update installation docs
+  - Backing store detection now uses creds from .ladybugrc
 
 .402
   - Re-work fix for self-ref tables

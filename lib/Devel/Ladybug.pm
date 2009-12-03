@@ -472,7 +472,7 @@ asserted as inline attributes.
 
 =over 4
 
-=item * C<ladybug-conf> - Generate an .ladybugrc on the local machine
+=item * C<ladybug-conf> - Generate a .ladybugrc on the local machine
 
 =item * C<ladybug-edit> - Edit Devel::Ladybug objects using VIM and YAML
 
