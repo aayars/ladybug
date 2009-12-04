@@ -1,3 +1,6 @@
+.404
+  - Update documentation for usage under mod_perl (thx rrose)
+
 .403
   - Modify die() handler to not hork on non-Error objects
   - Require 5.8.8+ in Makefile.PL and Ladybug.pm

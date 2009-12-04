@@ -11,7 +11,7 @@
 
 package Devel::Ladybug;
 
-our $VERSION = '0.403';
+our $VERSION = '0.404';
 
 use strict;
 use diagnostics;
@@ -119,7 +119,7 @@ L<Devel::Ladybug::TLDR>.
 
 =head1 VERSION
 
-This documentation is for version B<0.403> of Devel::Ladybug.
+This documentation is for version B<0.404> of Devel::Ladybug.
 
 =head1 FRAMEWORK ASSUMPTIONS
 
