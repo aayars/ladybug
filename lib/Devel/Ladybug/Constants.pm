@@ -113,7 +113,7 @@ sub init {
       dbPass         => undef,
       dbPort         => undef,
       dbUser         => 'ladybug',
-      memcachedHosts => [ '127.0.0.1:31337', ],
+      memcachedHosts => [ '127.0.0.1:11211', ],
       rcsBindir      => '/usr/bin',
       rcsDir         => 'RCS',
     };
@@ -253,7 +253,7 @@ must be valid YAML:
   dbPort: ~
   dbUser: op
   memcachedHosts:
-    - 127.0.0.1:31337
+    - 127.0.0.1:11211
   rcsBindir: /usr/bin
   rcsDir: RCS
 
