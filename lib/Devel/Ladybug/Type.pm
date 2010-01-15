@@ -71,7 +71,7 @@ Devel::Ladybug internals.
 
 Each returns a CODE block which may be used to validate data types.
 
-When executed, the test subs throw an C<Devel::Ladybug::AssertFailed>
+When executed, the test subs throw a C<Devel::Ladybug::AssertFailed>
 exception on validation failure, and return C<true> on success.
 
 =over 4

@@ -334,20 +334,20 @@ Host-specific overlays work with custom RC files as well.
 =item * No .ladybugrc found
 
 C<.ladybugrc> needs to exist in order for Devel::Ladybug to compile and
-run.  In the event that an C<.ladybugrc> was not found, Devel::Ladybug
+run.  In the event that a C<.ladybugrc> was not found, Devel::Ladybug
 will exit with an instructive message. Read and follow the provided
 steps when this occurs.
 
 =item * Some symbol not exported
 
   Uncaught exception from user code:
-        "______" is not exported by the Devel::Ladybug::Constants module
+  "foo" is not exported by the Devel::Ladybug::Constants module
   Can't continue after import errors ...
 
 This is a compile error. A module asked for a non-existent constant at
 compile time.
 
-The most likely cause is that Devel::Ladybug found an C<.ladybugrc>,
+The most likely cause is that Devel::Ladybug found a C<.ladybugrc>,
 but the required symbol wasn't in the file. To fix this, add the
 missing named constant to your C<.ladybugrc>. This typically happens
 when the C<.ladybugrc> which was loaded is for an older version of
