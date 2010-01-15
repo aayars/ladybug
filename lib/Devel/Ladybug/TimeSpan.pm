@@ -85,7 +85,7 @@ Stringifies as number of seconds unless overridden.
 Returns a new Devel::Ladybug::Type::TimeSpan instance which
 encapsulates the received L<Devel::Ladybug::Subtype> rules.
 
-  create "YourApp::Example::" => {
+  create "YourApp::Example" => {
     someTime  => Devel::Ladybug::TimeSpan->assert(...),
 
     # ...

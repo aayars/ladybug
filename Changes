@@ -4,7 +4,7 @@
   - Remove Time::Piece as dependency
   - MySQL reference options: onDelete and onUpdate renamed to
     deleteRefOpt and updateRefOpt
-  - More doc fixes
+  - Lots of perldoc revisions and fixes
 
 .403
   - Modify die() handler to not hork on non-Error objects

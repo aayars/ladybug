@@ -171,7 +171,7 @@ To use DATETIME as the column type, specify it as the value to the
 C<columnType> subtype arg. When using a DATETIME column, Devel::Ladybug
 will automatically ask the database to handle any necessary conversion.
 
-  create "YourApp::Example::" => {
+  create "YourApp::Example" => {
     someTimestamp  => Devel::Ladybug::DateTime->assert(
       subtype(
         columnType => "DATETIME",
