@@ -963,6 +963,7 @@ sub restore {
   return $self->revert($version);
 }
 
+
 =pod
 
 =back
@@ -1020,7 +1021,7 @@ sub __useYaml {
   my $useYaml = $class->get("__useYaml");
 
   if ( !defined $useYaml ) {
-    my %args = __autoArgs();
+    my %args = $class->__autoArgs();
 
     $useYaml = $args{"__useYaml"};
 
@@ -1131,7 +1132,7 @@ sub __useDbi {
   my $useDbi = $class->get("__useDbi");
 
   if ( !defined($useDbi) ) {
-    my %args = __autoArgs();
+    my %args = $class->__autoArgs();
 
     $useDbi = $args{__useDbi};
 
@@ -1229,7 +1230,7 @@ sub __dbiType {
   my $type = $class->get("__dbiType");
 
   if ( !defined($type) ) {
-    my %args = __autoArgs();
+    my %args = $class->__autoArgs();
 
     $type = $args{__dbiType};
 
@@ -1242,24 +1243,26 @@ sub __dbiType {
 my %createArgs;
 
 sub __autoArgs {
+  my $class = shift;
+
   return %createArgs if %createArgs;
 
   $createArgs{__useDbi}  = false;
   $createArgs{__useYaml} = true;
   $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::SQLite;
 
-  if ( __supportsSQLite() ) {
+  if ( $class->__supportsSQLite() ) {
     $createArgs{__useDbi}  = true;
     $createArgs{__useYaml} = false;
   }
 
-  if ( __supportsPostgreSQL() ) {
+  if ( $class->__supportsPostgreSQL() ) {
     $createArgs{__useDbi}  = true;
     $createArgs{__useYaml} = false;
     $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::PostgreSQL;
   }
 
-  if ( __supportsMySQL() ) {
+  if ( $class->__supportsMySQL() ) {
     $createArgs{__useDbi}  = true;
     $createArgs{__useYaml} = false;
     $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::MySQL;
@@ -1269,6 +1272,8 @@ sub __autoArgs {
 }
 
 sub __supportsSQLite {
+  my $class = shift;
+
   my $worked;
 
   eval {
@@ -1281,18 +1286,21 @@ sub __supportsSQLite {
 }
 
 sub __supportsMySQL {
+  my $class = shift;
+
   my $worked;
 
   eval {
     require DBD::mysql;
 
-    my $dbname = 'ladybug';
+    my $dbname = $class->databaseName;
 
     my $dsn = sprintf( 'DBI:mysql:database=%s;host=%s;port=%s',
-      $dbname, dbHost, dbPort || 3306 );
+      $dbname, $class->__dbHost, $class->__dbPort || 3306 );
 
-    my $dbh = DBI->connect( $dsn, dbUser, dbPass, { RaiseError => 1 } )
-      || die DBI->errstr;
+    my $dbh = DBI->connect(
+      $dsn, $class->__dbUser, $class->__dbPass, { RaiseError => 1 }
+    ) || die DBI->errstr;
 
     my $sth = $dbh->prepare("show tables") || die $dbh->errstr;
     $sth->execute || die $sth->errstr;
@@ -1305,18 +1313,21 @@ sub __supportsMySQL {
 }
 
 sub __supportsPostgreSQL {
+  my $class = shift;
+
   my $worked;
 
   eval {
     require DBD::Pg;
 
-    my $dbname = 'ladybug';
+    my $dbname = $class->databaseName;
 
     my $dsn = sprintf( 'DBI:Pg:database=%s;host=%s;port=%s',
-      $dbname, dbHost, dbPort || 5432 );
+      $dbname, $class->__dbHost, $class->__dbPort || 5432 );
 
-    my $dbh = DBI->connect( $dsn, dbUser, dbPass, { RaiseError => 1 } )
-      || die DBI->errstr;
+    my $dbh = DBI->connect(
+      $dsn, $class->__dbUser, $class->__dbPass, { RaiseError => 1 }
+    ) || die DBI->errstr;
 
     my $sth =
       $dbh->prepare("select count(*) from information_schema.tables")
@@ -1707,23 +1718,7 @@ sub __marshal {
   # input which was received, and to load any default instance
   # variables.
   #
-  $self = $class->new($self);
-
-  my $newRefType = ref($self);
-
-  #
-  # If we got this far, we're probably good... but here are a couple
-  # more checks as a developer's safety net.
-  #
-  throw Devel::Ladybug::DataConversionFailed(
-    "Couldn't bless $self into $class- did new() reject input?")
-    if !$newRefType;
-
-  throw Devel::Ladybug::DataConversionFailed(
-    "Couldn't bless $self into $class- got $newRefType (weird)")
-    if $newRefType ne $class;
-
-  return $self;
+  return $class->new($self);
 }
 
 =pod
@@ -2695,6 +2690,87 @@ sub __init {
 
   return true;
 }
+
+
+=pod
+
+=item * __dbUser, __dbPass, __dbHost, __dbPort
+
+These items may be set on a per-class basis.
+
+Unless overridden, credentials from the global C<.ladybugrc> will
+be used.
+
+  #
+  # Set as class variables in the prototype:
+  #
+  create "YourApp::YourClass" => {
+    __dbiType => Devel::Ladybug::Enum::DBIType::MySQL,
+    __dbUser => "user",
+    __dbPass => "pass",
+    __dbHost => "example.com",
+    __dbPort => 12345,
+
+  };
+
+
+  #
+  # Set at runtime, such as from apache startup:
+  #
+  my $class = "YourApp::YourClass";
+
+  YourApp::YourClass->__dbUser("user");
+  YourApp::YourClass->__dbPass("pass");
+  YourApp::YourClass->__dbHost("example.com");
+  YourApp::YourClass->__dbPort(12345);
+
+=cut
+
+
+sub __dbUser {
+  my $class = shift;
+
+  if ( scalar(@_) ) {
+    my $newValue = shift;
+    $class->set("__dbUser", $newValue);
+  }
+
+  return $class->get("__dbUser") || dbUser;
+}
+
+sub __dbPass {
+  my $class = shift;
+
+  if ( scalar(@_) ) {
+    my $newValue = shift;
+    $class->set("__dbPass", $newValue);
+  }
+
+  return $class->get("__dbPass") || dbPass;
+}
+
+sub __dbHost {
+  my $class = shift;
+
+  if ( scalar(@_) ) {
+    my $newValue = shift;
+    $class->set("__dbHost", $newValue);
+  }
+
+  return $class->get("__dbHost") || dbHost;
+}
+
+sub __dbPort {
+  my $class = shift;
+
+  if ( scalar(@_) ) {
+    my $newValue = shift;
+    $class->set("__dbPort", $newValue);
+  }
+
+  return $class->get("__dbPort") || dbPort;
+}
+
 
 =pod
 
