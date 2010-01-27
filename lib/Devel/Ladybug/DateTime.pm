@@ -36,7 +36,7 @@ sub assert {
     sub {
       my $time = $_[0];
 
-      if ( $time && $time =~ $datetimeRegex ) {
+      if ( $time && $time =~ /$datetimeRegex/ ) {
         $time = $class->newFrom( $1, $2, $3, $4, $5, $6 );
       }
 
@@ -59,7 +59,7 @@ sub new {
   my $class = shift;
   my $time  = shift;
 
-  if ( $time && $time =~ $datetimeRegex ) {
+  if ( $time && $time =~ /$datetimeRegex/ ) {
     return $class->newFrom( $1, $2, $3, $4, $5, $6 );
   }
 
