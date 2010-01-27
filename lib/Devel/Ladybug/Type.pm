@@ -799,7 +799,7 @@ our %RULES = (
   },
 
   # CASCADE, SET NULL, etc
-  onDelete => sub {
+  deleteRefOpt => sub {
     my $value = shift;
 
     insist( $value, isStr )
