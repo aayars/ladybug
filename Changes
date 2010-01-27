@@ -1,3 +1,7 @@
+.405
+  - Accept per-class database connection credentials
+  - Fix for DateTime instantiation from zero values
+
 .404
   - Update documentation for usage under mod_perl (thx rrose)
   - Use default memcached port by uh, default.

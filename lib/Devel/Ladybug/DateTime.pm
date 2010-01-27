@@ -59,7 +59,7 @@ sub new {
   my $class = shift;
   my $time  = shift;
 
-  if ( $time && $time =~ /$datetimeRegex/ ) {
+  if ( $time && $time =~ $datetimeRegex ) {
     return $class->newFrom( $1, $2, $3, $4, $5, $6 );
   }
 
@@ -91,6 +91,10 @@ sub newFrom {
   my $hour   = shift;
   my $minute = shift;
   my $sec    = shift;
+
+  if ( $year + $month + $day + $hour + $minute + $sec == 0 ) {
+    return $class->new();
+  }
 
   return $class->new(
     Time::Local::timelocal(
