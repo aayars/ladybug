@@ -3,12 +3,11 @@ package Devel::Ladybug::Persistence::Generic;
 use strict;
 use warnings;
 
+use DBI;
 use Error qw| :try |;
 
 use Devel::Ladybug::Enum::Bool;
 use Devel::Ladybug::Enum::DBIType;
-
-use GlobalDBI;
 
 sub columnNames {
   my $class = shift;
@@ -450,21 +449,6 @@ sub __wrapWithReconnect {
   warn "$class\::__wrapWithReconnect not implemented";
 
   return &$sub(@_);
-}
-
-sub __init {
-  my $class = shift;
-
-  if ( $class =~ /::Abstract/ ) {
-    return false;
-  }
-
-  #
-  #
-  #
-  warn "$class\::__init not implemented";
-
-  return true;
 }
 
 sub __updateColumnNames {

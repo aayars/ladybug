@@ -33,12 +33,12 @@ See L<Devel::Ladybug::Constants>.
 
 =item * C<connect(%args)>
 
-Constructor for a PostgreSQL GlobalDBI object.
+Constructor for a PostgreSQL DBI object.
 
 C<%args> is a hash with keys for C<database> (database name), C<host>,
 C<port>, C<user>, and C<pass>.
 
-Returns a new L<GlobalDBI> instance.
+Returns a new L<DBI> instance.
 
 =back
 
@@ -47,8 +47,8 @@ Returns a new L<GlobalDBI> instance.
 use strict;
 use warnings;
 
-use Error qw| :try |;
 use Devel::Ladybug::Enum::Bool;
+use Error qw| :try |;
 
 use base qw| Devel::Ladybug::Persistence::Generic |;
 
@@ -58,17 +58,14 @@ sub connect {
   my $dsn = sprintf( 'dbi:Pg:database=%s;host=%s;port=%s',
     $args{database}, $args{host}, $args{port} );
 
-  $GlobalDBI::CONNECTION{ $args{database} } ||=
-    [ $dsn, $args{user}, $args{pass}, { RaiseError => 1 } ];
-
-  return GlobalDBI->new( dbname => $args{database} );
+  return DBI->connect( $dsn, $args{user}, $args{pass}, { RaiseError => 1 } );
 }
 
 =pod
 
 =head1 SEE ALSO
 
-L<GlobalDBI>, L<DBI>, L<DBD::Pg>
+L<DBI>, L<DBD::Pg>
 
 L<Devel::Ladybug::Persistence>
 
@@ -80,7 +77,7 @@ This file is part of L<Devel::Ladybug>.
 ######## The remainder of this module contains vendor-specific overrides
 ########
 
-sub __init {
+sub __INIT {
   my $class = shift;
 
   if ( $class =~ /::Abstract/ ) {
