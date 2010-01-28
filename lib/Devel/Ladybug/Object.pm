@@ -797,7 +797,7 @@ sub AUTOLOAD {
 
     if ( !$receiver ) { $receiver = $self }
 
-    if ( $receiver->__useDbi ) {
+    if ( $receiver->can("__useDbi") && $receiver->__useDbi ) {
       my $delegate;
 
       if ( $receiver->__dbiType == 0 ) {
