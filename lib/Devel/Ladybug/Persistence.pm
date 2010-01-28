@@ -1618,12 +1618,14 @@ sub __marshal {
           my $sth = $elementClass->query(
             sprintf q|
             SELECT %s FROM %s
-              WHERE parentId = %s
-              ORDER BY elementIndex + 0
+              WHERE %s = %s
+              ORDER BY %s + 0
           |,
             $elementClass->__selectColumnNames()->join(", "),
             $elementClass->tableName(),
-            $elementClass->quote( $self->{ $class->__primaryKey() } )
+            $class->__elementParentKey(),
+            $elementClass->quote( $self->{ $class->__primaryKey() } ),
+            $class->__elementIndexKey(),
           );
 
           while ( my $element = $sth->fetchrow_hashref() ) {
@@ -1650,10 +1652,11 @@ sub __marshal {
 
           my $sth = $elementClass->query(
             sprintf q|
-            SELECT %s FROM %s WHERE parentId = %s
+            SELECT %s FROM %s WHERE %s = %s
           |,
             $elementClass->__selectColumnNames()->join(", "),
             $elementClass->tableName(),
+            $class->__elementParentKey(),
             $elementClass->quote( $self->{ $class->__primaryKey() } )
           );
 
@@ -2372,8 +2375,8 @@ sub remove {
       next if !$elementClass;
 
       $elementClass->write(
-        sprintf 'DELETE FROM %s WHERE parentId = %s',
-        $elementClass->tableName, $class->quote( $self->key ) );
+        sprintf 'DELETE FROM %s WHERE %s = %s',
+        $elementClass->tableName, $class->__elementParentKey, $class->quote( $self->key ) );
     }
 
     #
@@ -2900,8 +2903,9 @@ sub _localSaveInsideTransaction {
         my $elementClass = $class->elementClass($key);
 
         $elementClass->write(
-          sprintf 'DELETE FROM %s WHERE parentId = %s',
+          sprintf 'DELETE FROM %s WHERE %s = %s',
           $elementClass->tableName(),
+          $class->__elementParentKey(),
           $class->quote( $self->key() )
         );
 

@@ -566,11 +566,14 @@ sub _quotedValues {
     sub {
       my $key = shift;
 
-      my $value = $self->get($key);
+      my $realKey = $key;
+      $realKey =~ s/"//g;
+
+      my $value = $self->get($realKey);
 
       my $quotedValue;
 
-      my $type = $asserts->{$key};
+      my $type = $asserts->{$realKey};
       return if !$type;
 
       if ( $type->sqlInsertValue
@@ -683,6 +686,18 @@ sub __useForeignKeys {
   my $class = shift;
 
   return false;
+}
+
+sub __elementParentKey {
+  my $class = shift;
+
+  return "parentId";
+}
+
+sub __elementIndexKey {
+  my $class = shift;
+
+  return "elementIndex";
 }
 
 true;
