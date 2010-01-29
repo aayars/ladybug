@@ -32,7 +32,7 @@ ID objects stringify as base64, which makes them as small as practical.
     my $id = Devel::Ladybug::ID->new();
 
     # ...
-  }
+  };
 
   #
   # Instantiate an existing GUID from base64
@@ -41,7 +41,7 @@ ID objects stringify as base64, which makes them as small as practical.
     my $id = Devel::Ladybug::ID->new("EO2JXisF3hGSSg+s3t/Aww==");
 
     # ...
-  }
+  };
 
 You may also instantiate from and translate between string, hex, or
 binary GUID forms using the constructors inherited from L<Data::GUID>.

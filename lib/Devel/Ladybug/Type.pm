@@ -342,11 +342,11 @@ Consumed args are as follows:
     regex        => ..., # optional regex which value must match
     memberType   => ..., # Sub-assertion for arrays
     memberClass  => ..., # Name of inline or external class
-    uom          => ..., # String label for human reference
     descript     => ..., # Human-readable description
     example      => ..., # An example value for human reference
     deleteRefOpt => ..., # MySQL foreign constraint reference option
     updateRefOpt => ..., # MySQL foreign constraint reference option
+    indexed      => ..., # true|false
   );
 
 =back
@@ -740,8 +740,6 @@ sub test {
 # The subs test the received Subtype argument (if needed),
 # and return a sanitized value.
 #
-# eg. uom($argument)
-#
 # See the test() instance method, which performs test actions based on
 # assertion rules (you'll need to modify test() to handle new cases)
 #
@@ -876,6 +874,14 @@ our %RULES = (
     insist( $value, isStr ) && return $value;
   },
 
+  indexed => sub {
+    throw Devel::Ladybug::InvalidArgument(
+      "Extra arguments received by indexed()")
+      if @_ > 1;
+
+    return $_[0] ? true : false;
+  },
+
   unique => sub {
     my $value = shift;
 
@@ -913,12 +919,6 @@ our %RULES = (
     }
 
     return $value;
-  },
-
-  uom => sub {
-    my $value = shift;
-
-    insist( $value, isStr ) && return $value;
   },
 );
 

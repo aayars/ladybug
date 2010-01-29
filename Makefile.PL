@@ -7,6 +7,7 @@ my $prereqs = {
   Clone                  => 0.31,
   Data::GUID             => 0.045,
   DBI                    => 1.40,
+  DBIx::TextIndex        => 0.28,
   Digest::SHA1           => 2.12,
   Error                  => 0.17015,
   File::HomeDir          => 0.86,

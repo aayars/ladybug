@@ -42,6 +42,7 @@ use warnings;
 #
 use Cache::Memcached::Fast;
 use Clone qw| clone |;
+use DBIx::TextIndex;
 use Digest::SHA1 qw| sha1_hex |;
 use Error qw| :try |;
 use File::Copy;
@@ -206,6 +207,83 @@ sub write {
 
   return $class->__wrapWithReconnect(
     sub { return $class->__write($query) } );
+}
+
+=pod
+
+=item * $class->search($hash)
+
+Wrapper to L<DBIx::TextIndex>'s full-text C<search> method.
+
+Returns a L<Devel::Ladybug::Hash> of hit IDs, or C<undef> if the class
+contains no indexed fields.
+
+Attributes which are asserted as C<indexed> will be automatically
+added to the class's fulltext index at save time. This is not
+recommended for frequently changing data.
+
+  #
+  # In class YourApp/SearchExample.pm:
+  #
+  use Devel::Ladybug qw| :all |;
+
+  create "YourApp::SearchExample" => {
+    field1 => Devel::Ladybug::Str->assert(
+      subtype( indexed => true )
+    ),
+    field2 => Devel::Ladybug::Str->assert(
+      subtype( indexed => true )
+    ),
+  };
+
+Meanwhile...
+
+  #
+  # In caller, mysearch.pl:
+  #
+  use YourApp::SearchExample;
+
+  my $class = "YourApp::SearchExample";
+
+  #
+  # See DBIx::TextIndex
+  #
+  my $ids = $class->search({
+    field1 => '"a phrase" +and −not or',
+    field2 => 'more words',
+  });
+
+  #
+  # Or, just provide a string:
+  #
+  # my $ids = $class->search("hello world");
+
+  $ids->each( sub {
+    my $id = shift;
+
+    my $obj = $class->load($id);
+  } );
+
+=cut
+
+sub search {
+  my $class = shift;
+  my $query = shift || return;
+
+  my $index = $class->__textIndex;
+
+  return if !$index;
+
+  if ( !ref($query) ) {
+    my $text = $query;
+    $query = { };
+    $class->__indexedFields->each( sub {
+      my $field = shift;
+      $query->{$field} = $text;
+    } );
+  }
+
+  return Devel::Ladybug::Hash->new( $index->search($query) );
 }
 
 =pod
@@ -2171,27 +2249,59 @@ sub __init {
     $alreadyWarnedForMemcached++;
   }
 
+  if ( !$class->__useDbi ) {
+    return;
+  }
+
   #
   # Initialize classes for inline elements
   #
   my $asserts = $class->asserts;
+
+  my $indexed = Devel::Ladybug::Array->new;
 
   $asserts->each(
     sub {
       my $key    = shift;
       my $assert = $asserts->{$key};
 
-      return
-        if !$assert->isa("Devel::Ladybug::Type::Array")
-          && !$assert->isa("Devel::Ladybug::Type::Hash");
+      if ( $assert->indexed ) {
+        $indexed->push($key);
+      }
 
-      $class->elementClass($key);
+      if (
+        $assert->isa("Devel::Ladybug::Type::Array")
+         || $assert->isa("Devel::Ladybug::Type::Hash")
+      ) {
+        $class->elementClass($key);
+      }
     }
   );
+
+  #
+  #
+  #
+  if ( $indexed->size > 0 ) {
+    my $index = DBIx::TextIndex->new({
+      index_dbh   => $class->__dbh,
+      collection  => join("_", $class->tableName, "idx"),
+      doc_fields  => $indexed,
+    });
+
+    $index->initialize if !$index->_collection_table_exists;
+
+    $class->set("__textIndex", $index);
+    $class->set("__indexedFields", $indexed);
+  }
 
   return true;
 }
 
+sub __textIndex {
+  my $class = shift;
+
+  return $class->get("__textIndex");
+}
 
 =pod
 
@@ -2214,9 +2324,8 @@ be used.
 
   };
 
-
   #
-  # Set at runtime, such as from apache startup:
+  # Or, set at runtime (such as from apache startup):
   #
   my $class = "YourApp::YourClass";
 
@@ -2400,6 +2509,11 @@ sub remove {
     my $key = $class->__cacheKey( $self->key() );
 
     $memd->delete($key);
+  }
+
+  my $index = $class->__textIndex;
+  if ( $index ) {
+    $self->_removeFromTextIndex($index);
   }
 
   if ( $class->__useYaml() ) {
@@ -2851,6 +2965,11 @@ sub _localSave {
     }
   }
 
+  my $index = $class->__textIndex;
+  if ( $index ) {
+    $self->_saveToTextIndex($index);
+  }
+
   return $saved;
 }
 
@@ -3026,6 +3145,36 @@ sub _saveToMemcached {
   }
 
   return;
+}
+
+=pod
+
+=item * $self->_saveToTextIndex
+
+Adds indexed values to this class's DBIx::TextIndex collection
+
+=cut
+
+sub _saveToTextIndex {
+  my $self = shift;
+  my $index = shift;
+
+  $index->add( $self->key => $self );
+}
+
+=pod
+
+=item * $self->_removeFromTextIndex
+
+Removes indexed values from this class's DBIx::TextIndex collection
+
+=cut
+
+sub _removeFromTextIndex {
+  my $self = shift;
+  my $index = shift;
+
+  $index->remove( $self->key );
 }
 
 =pod

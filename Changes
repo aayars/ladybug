@@ -1,3 +1,6 @@
+.407
+  - Add full-text search methods (thx DBIx::TextIndex)
+
 .406
   - Fix for detection of missing RCS binaries
 
