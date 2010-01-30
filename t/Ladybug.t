@@ -423,7 +423,7 @@ sub testExtID {
       $childClass => {
         %{$prototype},
 
-        parentId => Devel::Ladybug::ExtID->assert($class),
+        parentId => $class->assert,
       }
     ),
     "Allocate child class"
@@ -492,8 +492,9 @@ sub testSelfReferentialClass {
       $class => {
         %{$prototype},
 
-        parentId => Devel::Ladybug::ExtID->assert($class,
-          Devel::Ladybug::Type::subtype( optional => true ) ),
+        parentId => Devel::Ladybug::ExtID->assert( $class,
+          Devel::Ladybug::Type::subtype( optional => true )
+        ),
       }
     ),
     "Allocate self-referential class"

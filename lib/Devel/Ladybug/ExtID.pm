@@ -19,10 +19,16 @@ Devel::Ladybug::ExtID - Define inter-object relationships
 
   use Devel::Ladybug qw| :all |;
 
-  create "YourApp::ChildObject" => {
-    parentObjectId => Devel::Ladybug::ExtID->assert(
-      "YourApp::ParentObject"
-    )
+  use YourApp::Parent;
+
+  create "YourApp::Child" => {
+    # refer to Parent by ID:
+    parentId => YourApp::Parent->assert,
+
+    # the above is shorthand for:
+    # parentId => Devel::Ladybug::ExtID->assert(
+    #   "YourApp::Parent"
+    # )
   };
 
 =head1 DESCRIPTION
@@ -65,19 +71,19 @@ enforce database-level foreign key constraints.
 Create a class of object which refers to itself by parent ID:
 
   #
-  # File: YourApp/ParentObject.pm
+  # File: YourApp/Parent.pm
   #
   use strict;
   use warnings;
 
   use Devel::Ladybug qw| :all |;
 
-  create "YourApp::ParentObject" => {
+  create "YourApp::Parent" => {
     #
     # Folders can go in other folders:
     #
     parentId => Devel::Ladybug::ExtID->assert(
-      "YourApp::ParentObject",
+      "YourApp::Parent",
       subtype(
         optional => true
       )
@@ -95,15 +101,15 @@ which refers to it:
   use strict;
   use warnings;
 
-  use YourApp::ParentObject;
+  use YourApp::Parent;
 
-  my $parent = YourApp::ParentObject->new(
+  my $parent = YourApp::Parent->new(
     name => "Hello Parent"
   );
 
   $parent->save;
 
-  my $child = YourApp::ChildObject"->new(
+  my $child = YourApp::Child"->new(
     name => "Hello Child",
     parentId => $parent->id,
   );
@@ -116,19 +122,17 @@ A document class, building on the above example. Documents refer
 to their parent by ID:
 
   #
-  # File: YourApp/ChildObject.pm
+  # File: YourApp/Child.pm
   #
   use strict;
   use warnings;
 
   use Devel::Ladybug qw| :all |;
 
-  use YourApp::ParentObject; # You must "use" any external classes
+  use YourApp::Parent; # You must "use" any external classes
 
-  create "YourApp::ChildObject" => {
-    parentId => Devel::Ladybug::ExtID->assert(
-      "YourApp::ParentObject"
-    )
+  create "YourApp::Child" => {
+    parentId => YourApp::Parent->assert,
 
   };
 
@@ -141,11 +145,11 @@ parent:
   use strict;
   use warnings;
 
-  use YourApp::ChildObject;
+  use YourApp::Child;
 
-  my $parent = YourApp::ParentObject->loadByName("Hello Parent");
+  my $parent = YourApp::Parent->loadByName("Hello Parent");
 
-  my $child = YourApp::ChildObject->new(
+  my $child = YourApp::Child->new(
     name => "Hello Again",
     parentId => $parent->id
   );
@@ -164,10 +168,8 @@ to create a one-to-many relationship.
   # ...
 
   create "YourApp::OneToManyExample" => {
-    parentIds => Devel::Ladybug::Array->assert
-      Devel::Ladybug::ExtID->assert(
-        "YourApp::ParentObject"
-      )
+    parentIds => Devel::Ladybug::Array->assert(
+      YourApp::Parent->assert
     ),
 
     # ...
@@ -187,11 +189,8 @@ subtype argument.
   # ...
 
   create "YourApp::OneToOneExample" => {
-    parentId => Devel::Ladybug::ExtID->assert(
-      "YourApp::ParentObject",
-      subtype(
-        unique => true
-      )
+    parentId => YourApp::Parent->assert(
+      subtype( unique => true )
     ),
     
     # ...
@@ -207,8 +206,7 @@ This is entirely an application-level constraint, and is not enforced
 by the database when manually inserting or updating rows. Careful!
 
   create "YourApp::PickyExample" => {
-    userId => Devel::Ladybug::ExtID->assert(
-      "YourApp::Example::User",
+    userId => YourApp::Example::User->assert(
       "select id from example_user where foo = 1"
     ),
 
@@ -248,8 +246,7 @@ B<not> need to do this unless the C<id> assertion was overridden.
   create "YourApp::FunkySelfRef" => {
     id => Devel::Ladybug::Serial->assert(),
 
-    parentId => Devel::Ladybug::ExtID->assert(
-      "YourApp::FunkySelfRef",
+    parentId => YourApp::FunkySelfRef->assert(
       subtype(
         columnType => "INTEGER"     # <-- eg
       )

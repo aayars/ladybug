@@ -342,7 +342,7 @@ following is the recommended approach:
   use YourApp::Example;
 
   create "YourApp::Example::Attrib" => {
-    exampleId => Devel::Ladybug::ExtID->assert( "YourApp::Example" ),
+    exampleId => YourApp::Example->assert,
 
     elementKey => Devel::Ladybug::Str->assert(
       #

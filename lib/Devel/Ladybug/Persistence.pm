@@ -487,7 +487,7 @@ Example A:
   # In a class prototype, there was an ExtID assertion:
   #
   create "YourApp::Example" => {
-    userId => Devel::Ladybug::ExtID->assert( "YourApp::Example::User" ),
+    userId => YourApp::Example::User->assert,
 
     # Stuff ...
   };
@@ -897,9 +897,9 @@ sub elementClass {
         name => Devel::Ladybug::Name->assert(
           Devel::Ladybug::Type::subtype( optional => true )
         ),
-        parentId     => Devel::Ladybug::ExtID->assert($class),
-        elementIndex => Devel::Ladybug::Int->assert(),
-        elementValue => $type->memberType()
+        parentId     => $class->assert,
+        elementIndex => Devel::Ladybug::Int->assert,
+        elementValue => $type->memberType,
       };
 
     } elsif ( $type->objectClass()->isa('Devel::Ladybug::Hash') ) {
@@ -913,9 +913,9 @@ sub elementClass {
         name => Devel::Ladybug::Name->assert(
           Devel::Ladybug::Type::subtype( optional => true )
         ),
-        parentId     => Devel::Ladybug::ExtID->assert($class),
-        elementKey   => Devel::Ladybug::Str->assert(),
-        elementValue => Devel::Ladybug::Str->assert(),
+        parentId     => $class->assert,
+        elementKey   => Devel::Ladybug::Str->assert,
+        elementValue => Devel::Ladybug::Str->assert,
       };
     }
   }
