@@ -736,7 +736,7 @@ modules
 
 =head1 DESCRIPTION
 
-This module should not be used directly.
+This module will typically be used indirectly.
 
 New DBI types should use this module as a base, and override methods as
 needed.

@@ -20,17 +20,21 @@ Devel::Ladybug::Persistence - Serialization mix-in
 
 Configurable class mix-in for storable Devel::Ladybug objects.
 
-Provides transparent support for various serialization methods.
+This package will typically be used indirectly. Subclasses created
+with Devel::Ladybug's C<create> function will respond to these
+methods by default.
 
-=head1 SYNOPSIS
+Connection settings are controlled via C<.ladybugrc> (See
+L<Devel::Ladybug::Constants>), or may be overridden on a per-class
+basis (See C<__dbHost> or C<__dbUser>, in this document).
 
-This package should not typically be used directly. Subclasses created
-with Devel::Ladybug's C<create> function will respond to these methods
-by default.
+Database and table names are automatically derived, but may be
+overridden on a per-class basis (See C<databaseName> or C<tableName>,
+in this document).
 
-See __use<Feature>() and C<__dbiType()>, under the Class Callback
-Methods section, for directions on how to disable or augment backing
-store options when subclassing.
+See C<__use[Feature]> and C<__dbiType>, in this document, for
+directions on how to disable or augment specific backing store
+options when subclassing.
 
 =cut
 
@@ -750,7 +754,7 @@ sub quote {
 
 =item * $class->databaseName()
 
-Returns the name of the receiving class's database. Corresponds to  the
+Returns the name of the receiving class's database. Corresponds to the
 lower-cased first-level Perl namespace, unless overridden in subclass.
 
   do {

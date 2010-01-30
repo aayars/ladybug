@@ -232,26 +232,26 @@ by the database when manually inserting or updating rows. Careful!
 
 =head2 Same-table non-GUID keys
 
-Self-referential tables whose ID is not of type L<Devel::Ladybug::ID>
-should assert an appropriate column type. This is needed because at
-class creation time, Ladybug does not yet know anything about the
-ID of the class being created. This workaround is only needed for
-self-referential tables which have overridden their C<id> column.
+Self-referential tables (tables which refer back to themselves by
+parent ID), with an ID assertion which is not of type
+L<Devel::Ladybug::ID>, should assert an appropriate column type in
+the ExtID assertion's subtype args. This workaround is only needed
+for self-referential tables which have overridden their C<id> column.
 
-You do B<not> need to do this for externally referencing tables,
+You do B<not> need to do this for externally referential tables,
 since Ladybug will already know which column type to use. You do
 B<not> need to do this unless the C<id> assertion was overridden.
 
   create "YourApp::FunkySelfRef" => {
-    id => Devel::Ladybug::Serial->assert(),
+    id => Devel::Ladybug::Serial->assert(), # Overriding ID type
 
     #
-    # ExtID->assert must be used directly, for the same reason:
+    # Use ExtID->assert directly for self-ref tables:
     #
     parentId => Devel::Ladybug::ExtID->assert(
       "YourApp::FunkySelfRef",
       subtype(
-        columnType => "INTEGER"     # <-- eg
+        columnType => "INTEGER" # <-- Must match ID column type
       )
     ),
 

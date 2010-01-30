@@ -81,7 +81,7 @@ __END__
 
 =head1 NAME
 
-Devel::Ladybug - Compact schema prototyping (formerly "OP")
+Devel::Ladybug - Data modeling framework
 
 =head1 SYNOPSIS
 
@@ -97,21 +97,23 @@ examples.
 
 =head1 DESCRIPTION
 
-Devel::Ladybug is a Perl 5 framework for prototyping schema-backed
-object classes.
+Devel::Ladybug is a data modeling framework.
 
 Using Devel::Ladybug's C<create()> function, the developer asserts
 rules for object classes. Devel::Ladybug's purpose is to automatically
-derive a database schema, handle object-relational mapping, and provide
-input validation for classes created in this manner.
+derive a backing store, and to handle mapping and validation of
+input for classes created in this manner.
 
-Devel::Ladybug works with MySQL/InnoDB, PostgreSQL, SQLite, and YAML
-flatfile. If the backing store type for a class is not specified,
-Devel::Ladybug will try to automatically determine an appropriate type
-for the local system. If memcached is available, Devel::Ladybug will
-use it in conjunction with the permanent backing store.
+Devel::Ladybug works with YAML flatfile, MySQL/InnoDB, PostgreSQL,
+and SQLite. If the backing store type for a class is not specified,
+Devel::Ladybug tries to automatically determine an appropriate
+type for the local system.
 
-L<Devel::Ladybug::TLDR>
+If memcached is available, Devel::Ladybug uses it in conjunction
+with the permanent backing store. When indexed fields are specified,
+Ladybug uses L<DBIx::TextIndex> to maintain a full-text index.
+
+See also: L<Devel::Ladybug::TLDR>
 
 =head1 VERSION
 
@@ -129,13 +131,12 @@ See CONFIGURATION AND ENVIRONMENT in this document.
 
 =head2 Classes Make Tables
 
-Devel::Ladybug derives database schemas from the assertions contained
-in object classes, and creates the tables that it needs.
+Database schemas are derived from the assertions contained
+in object classes. Devel::Ladybug creates any needed tables.
 
 =head2 Default Base Attributes
 
-Database-backed Devel::Ladybug objects B<always> have "id", "name",
-"ctime", and "mtime".
+Persistent objects B<always> have "id", "name", "ctime", and "mtime".
 
 =over 4
 
@@ -211,14 +212,18 @@ asserted as B<optional> in the class prototype. To do so, provide
 
 Devel::Ladybug's core packages live under the Devel::Ladybug::
 namespace. Your classes should live in their own top-level namespace,
-e.g. "YourApp::". This will translate (in lower case) to the name of
-the app's database. The database name may be overridden by implementing
-class method C<databaseName>.
+e.g. "YourApp::YourClass".
+
+The top level namespace (eg "YourApp") translates, in lower case,
+to the name of the app's database. The database name may be overridden
+by implementing class method C<databaseName>. Devel::Ladybug does
+not create MySQL or PostgreSQL databases.
 
 Namespace elements beyond the top-level translate to lower case table
 names. In cases of nested namespaces, Perl's "::" delineator is swapped
 out for an underscore (_). The table name may be overridden by
-implementing class method C<tableName>.
+implementing class method C<tableName>. Devel::Ladybug creates any
+tables that it needs, automatically.
 
   create "YourApp::Example::Foo" => {
     # overrides default value of "yourapp"
@@ -308,7 +313,7 @@ prototype object for its argument.
 =head2 IN METHODS
 
 Constructors and setter methods accept both native Perl 5 data types
-and their Devel::Ladybug object class equivalents. The setters will
+and their Devel::Ladybug object class equivalents. The setters 
 automatically handle any necessary conversion, or throw an exception if
 the received arg doesn't quack like a duck.
 
@@ -500,7 +505,7 @@ directory.
 To generate a first-time config for the local machine, copy the
 .ladybugrc (included with this distribution as C<ladybugrc-dist>) to
 the proper location, or run C<ladybug-conf> (also included with this
-distribution) as the user who will be running Devel::Ladybug.
+distribution) as the user running Devel::Ladybug.
 
 See L<Devel::Ladybug::Constants> for information regarding customizing
 and extending the local rc file.
