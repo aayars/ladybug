@@ -47,7 +47,12 @@ do {
     testInt      => Devel::Ladybug::Int->assert(),
     testNum      => Devel::Ladybug::Num->assert(),
     testRule     => Devel::Ladybug::Rule->assert(),
-    testStr      => Devel::Ladybug::Str->assert(),
+    testStr      => Devel::Ladybug::Str->assert(
+      Devel::Ladybug::Type::subtype( indexed => true ),
+    ),
+    testStr2      => Devel::Ladybug::Str->assert(
+      Devel::Ladybug::Type::subtype( indexed => true ),
+    ),
     testTimeSpan => Devel::Ladybug::TimeSpan->assert(),
   );
 
@@ -60,6 +65,7 @@ do {
     testNum      => 42,
     testRule     => qr/foo/,
     testStr      => "example",
+    testStr2     => "the rain in spain falls gently",
     testTimeSpan => 60 * 24,
   );
 };
@@ -341,7 +347,26 @@ sub kickClassTires {
     }
   };
 
-  my $ids = $class->allIds;
+  if ( $class->__useDbi ) {
+    my $query = "rain gently";
+
+    my $ids;
+
+    ok( $ids = $class->search($query), "Full-text search" );
+
+    $ids->each( sub {
+      my $id = shift;
+      my $obj;
+      isa_ok( $obj = $class->load($id),
+        $class, "Object retrieved from backing store" );
+
+      kickObjectTires($obj);
+    } );
+  };
+
+  my $ids;
+
+  ok( $ids = $class->allIds, "Look up all IDs" );
 
   $ids->each(
     sub {

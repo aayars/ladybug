@@ -380,6 +380,12 @@ sub __dropTable {
 
   my $query = "DROP TABLE $table;\n";
 
+  my $index = $class->__textIndex;
+
+  if ( $index ) {
+    $index->delete if $index->_collection_table_exists;
+  }
+
   return $class->write($query);
 }
 
@@ -401,6 +407,12 @@ sub __createTable {
       $elementClass->__init();
     }
   );
+
+  my $index = $class->__textIndex;
+
+  if ( $index ) {
+    $index->initialize;
+  }
 
   return true;
 }

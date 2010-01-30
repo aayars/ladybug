@@ -2288,8 +2288,6 @@ sub __init {
       doc_fields  => $indexed,
     });
 
-    $index->initialize if !$index->_collection_table_exists;
-
     $class->set("__textIndex", $index);
     $class->set("__indexedFields", $indexed);
   }
