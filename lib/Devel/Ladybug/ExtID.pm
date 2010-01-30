@@ -242,11 +242,14 @@ You do B<not> need to do this for externally referencing tables,
 since Ladybug will already know which column type to use. You do
 B<not> need to do this unless the C<id> assertion was overridden.
 
-
   create "YourApp::FunkySelfRef" => {
     id => Devel::Ladybug::Serial->assert(),
 
-    parentId => YourApp::FunkySelfRef->assert(
+    #
+    # ExtID->assert must be used directly, for the same reason:
+    #
+    parentId => Devel::Ladybug::ExtID->assert(
+      "YourApp::FunkySelfRef",
       subtype(
         columnType => "INTEGER"     # <-- eg
       )
