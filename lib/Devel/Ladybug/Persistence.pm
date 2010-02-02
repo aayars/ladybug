@@ -21,7 +21,7 @@ use base qw| DBIx::TextIndex |;
 sub remove {
   my $self = shift;
 
-  return if ref($_[0]) && !$_->[0];
+  return if ref( $_[0] ) && !$_->[0];
 
   $self->SUPER::remove(@_);
 }
@@ -196,8 +196,7 @@ sub query {
   my $class = shift;
   my $query = shift;
 
-  return $class->__wrapWithReconnect(
-    sub { return $class->__query($query) } );
+  return $class->__wrapWithReconnect( sub { return $class->__query($query) } );
 }
 
 =pod
@@ -226,8 +225,7 @@ sub write {
   my $class = shift;
   my $query = shift;
 
-  return $class->__wrapWithReconnect(
-    sub { return $class->__write($query) } );
+  return $class->__wrapWithReconnect( sub { return $class->__write($query) } );
 }
 
 =pod
@@ -297,16 +295,18 @@ sub search {
 
   if ( !ref($query) ) {
     my $text = $query;
-    $query = { };
-    $class->__indexedFields->each( sub {
-      my $field = shift;
+    $query = {};
+    $class->__indexedFields->each(
+      sub {
+        my $field = shift;
 
-      $query->{lc($field)} = $text;
-    } );
+        $query->{ lc($field) } = $text;
+      }
+    );
   } else {
-    my $lcQuery = { };
+    my $lcQuery = {};
 
-    for my $field ( keys %{ $query } ) {
+    for my $field ( keys %{$query} ) {
       $lcQuery->{ lc($field) } = $query->{field};
     }
 
@@ -438,8 +438,7 @@ sub selectMulti {
   my $results = Devel::Ladybug::Array->new();
 
   while ( my @row = $sth->fetchrow_array() ) {
-    $results->push(
-      @row > 1 ? Devel::Ladybug::Array->new(@row) : $row[0] );
+    $results->push( @row > 1 ? Devel::Ladybug::Array->new(@row) : $row[0] );
   }
 
   $sth->finish();
@@ -561,13 +560,11 @@ sub doesIdExist {
 
   if ( $class->__useDbi ) {
     return $class->selectBool(
-      $class->__doesIdExistStatement(
-        $class->__primaryKeyClass->new($id)
-      )
-    );
+      $class->__doesIdExistStatement( $class->__primaryKeyClass->new($id) ) );
   } else {
-    my $path = join( "/",
-      $class->__basePath, Devel::Ladybug::ID->new($id)->as_string() );
+    my $path =
+      join( "/", $class->__basePath,
+      Devel::Ladybug::ID->new($id)->as_string() );
 
     return -e $path;
   }
@@ -698,8 +695,7 @@ sub idForName {
   my $class = shift;
   my $name  = shift;
 
-  return $class->selectSingle( $class->__idForNameStatement($name) )
-    ->shift;
+  return $class->selectSingle( $class->__idForNameStatement($name) )->shift;
 }
 
 =pod
@@ -717,8 +713,8 @@ sub nameForId {
   my $id    = shift;
 
   return $class->selectSingle(
-    $class->__nameForIdStatement( $class->__primaryKeyClass->new($id) )
-  )->shift;
+    $class->__nameForIdStatement( $class->__primaryKeyClass->new($id) ) )
+    ->shift;
 }
 
 =pod
@@ -805,7 +801,7 @@ sub databaseName {
       $dbName =~ s/:.*//;
     }
 
-    $class->set("__databaseName", $dbName);
+    $class->set( "__databaseName", $dbName );
   }
 
   return $dbName;
@@ -1048,7 +1044,6 @@ sub restore {
 
   return $self->revert($version);
 }
-
 
 =pod
 
@@ -1368,9 +1363,10 @@ sub __supportsMySQL {
     my $dsn = sprintf( 'DBI:mysql:database=%s;host=%s;port=%s',
       $dbname, $class->__dbHost, $class->__dbPort || 3306 );
 
-    my $dbh = DBI->connect(
-      $dsn, $class->__dbUser, $class->__dbPass, { RaiseError => 1 }
-    ) || die DBI->errstr;
+    my $dbh =
+      DBI->connect( $dsn, $class->__dbUser, $class->__dbPass,
+      { RaiseError => 1 } )
+      || die DBI->errstr;
 
     my $sth = $dbh->prepare("show tables") || die $dbh->errstr;
     $sth->execute || die $sth->errstr;
@@ -1395,12 +1391,12 @@ sub __supportsPostgreSQL {
     my $dsn = sprintf( 'DBI:Pg:database=%s;host=%s;port=%s',
       $dbname, $class->__dbHost, $class->__dbPort || 5432 );
 
-    my $dbh = DBI->connect(
-      $dsn, $class->__dbUser, $class->__dbPass, { RaiseError => 1 }
-    ) || die DBI->errstr;
+    my $dbh =
+      DBI->connect( $dsn, $class->__dbUser, $class->__dbPass,
+      { RaiseError => 1 } )
+      || die DBI->errstr;
 
-    my $sth =
-      $dbh->prepare("select count(*) from information_schema.tables")
+    my $sth = $dbh->prepare("select count(*) from information_schema.tables")
       || die $dbh->errstr;
 
     $sth->execute || die $sth->errstr;
@@ -1457,12 +1453,14 @@ sub __baseAsserts {
       ),
       mtime => Devel::Ladybug::DateTime->assert(
         Devel::Ladybug::Type::subtype(
-          descript   => "The last modified timestamp of this object", @dtArgs
+          descript => "The last modified timestamp of this object",
+          @dtArgs
         )
       ),
       ctime => Devel::Ladybug::DateTime->assert(
         Devel::Ladybug::Type::subtype(
-          descript   => "The creation timestamp of this object", @dtArgs
+          descript => "The creation timestamp of this object",
+          @dtArgs
         )
       ),
     );
@@ -1698,17 +1696,17 @@ sub __marshal {
 
   my $asserts = $class->asserts();
 
-#
-# Re-assemble complex structures using data from linked tables.
-#
-# For arrays, "elementIndex" is the array index, and "elementValue"
-# is the actual element value. Each element is a row in the linked table.
-#
-# For hashes, "elementKey" is the key, and "elementValue" is the value.
-# Each key/value pair is a row in the linked table.
-#
-# The parent object is referenced by id in parentId.
-#
+  #
+  # Re-assemble complex structures using data from linked tables.
+  #
+  # For arrays, "elementIndex" is the array index, and "elementValue"
+  # is the actual element value. Each element is a row in the linked table.
+  #
+  # For hashes, "elementKey" is the key, and "elementValue" is the value.
+  # Each key/value pair is a row in the linked table.
+  #
+  # The parent object is referenced by id in parentId.
+  #
   $asserts->each(
     sub {
       my $key = $_;
@@ -1778,8 +1776,7 @@ sub __marshal {
 
             $element = $elementClass->__marshal($element);
 
-            $hash->{ $element->elementKey() } =
-              $element->elementValue();
+            $hash->{ $element->elementKey() } = $element->elementValue();
           }
 
           $sth->finish();
@@ -1878,8 +1875,7 @@ sub __cacheKey {
     my $caller = caller();
 
     throw Devel::Ladybug::InvalidArgument(
-"BUG (Check $caller): $class->__cacheKey(\$id) received undef for \$id"
-    );
+      "BUG (Check $caller): $class->__cacheKey(\$id) received undef for \$id" );
   }
 
   my $qid = join( '/', $class, $id );
@@ -1901,8 +1897,7 @@ sub __write {
   if ($@) {
     my $err = $class->__dbh()->errstr() || $@;
 
-    Devel::Ladybug::DBQueryFailed->throw(
-      join( ': ', $class, $err, $query ) );
+    Devel::Ladybug::DBQueryFailed->throw( join( ': ', $class, $err, $query ) );
   }
 
   return $rows;
@@ -1913,8 +1908,7 @@ sub __query {
   my $query = shift;
 
   my $dbh = $class->__dbh()
-    || throw Devel::Ladybug::DBConnectFailed
-    "Unable to connect to database";
+    || throw Devel::Ladybug::DBConnectFailed "Unable to connect to database";
 
   my $sth;
 
@@ -2003,7 +1997,7 @@ active.
 sub __dbhKey {
   my $class = shift;
 
-  return join("_", $class->databaseName, $class->__dbiType);
+  return join( "_", $class->databaseName, $class->__dbiType );
 }
 
 sub __dbh {
@@ -2011,11 +2005,11 @@ sub __dbh {
 
   if ( !$class->__useDbi ) {
     Devel::Ladybug::RuntimeError->throw(
-      "BUG: $class was asked for its DBH, but it does not use DBI." );
+      "BUG: $class was asked for its DBH, but it does not use DBI.");
   }
 
   my $dbName = $class->databaseName();
-  my $dbKey = $class->__dbhKey();
+  my $dbKey  = $class->__dbhKey();
 
   $dbi ||= Devel::Ladybug::Hash->new();
   $dbi->{$dbKey} ||= Devel::Ladybug::Hash->new();
@@ -2052,10 +2046,7 @@ sub __dbh {
         Devel::Ladybug::Persistence::PostgreSQL::connect(%creds);
     } else {
       throw Devel::Ladybug::InvalidArgument(
-        sprintf(
-          'Unknown DBI Type %s returned by class %s',
-          $dbiType, $class
-        )
+        sprintf( 'Unknown DBI Type %s returned by class %s', $dbiType, $class )
       );
     }
   }
@@ -2090,8 +2081,8 @@ sub __loadYamlFromId {
 
   my $joinStr = ( $class->__basePath() =~ /\/$/ ) ? '' : '/';
 
-  my $self = $class->__loadYamlFromPath(
-    join( $joinStr, $class->__basePath(), $id ) );
+  my $self =
+    $class->__loadYamlFromPath( join( $joinStr, $class->__basePath(), $id ) );
 
   # $self->set( $class->__primaryKey(), $id );
 
@@ -2117,8 +2108,7 @@ sub __loadYamlFromPath {
 
     return $class->loadYaml($yaml);
   } else {
-    throw Devel::Ladybug::FileAccessError(
-      "Path $path does not exist on disk");
+    throw Devel::Ladybug::FileAccessError("Path $path does not exist on disk");
   }
 }
 
@@ -2216,8 +2206,7 @@ sub __checkYamlHost {
 
       if ( $thisHost ne $yamlHost ) {
         Devel::Ladybug::WrongHost->throw(
-          "YAML archives must be saved on host $yamlHost, not $thisHost"
-        );
+          "YAML archives must be saved on host $yamlHost, not $thisHost" );
       }
     }
   }
@@ -2242,6 +2231,7 @@ sub __init {
 
   if ( $class->__useRcs ) {
     if ( $^O eq 'openbsd' ) {
+
       #
       # XXX Contacted OpenRCS author re: arch dir probs, will fix this later
       #
@@ -2299,10 +2289,9 @@ sub __init {
         $indexed->push($key);
       }
 
-      if (
-        $assert->isa("Devel::Ladybug::Type::Array")
-         || $assert->isa("Devel::Ladybug::Type::Hash")
-      ) {
+      if ( $assert->isa("Devel::Ladybug::Type::Array")
+        || $assert->isa("Devel::Ladybug::Type::Hash") )
+      {
         $class->elementClass($key);
       }
     }
@@ -2312,18 +2301,22 @@ sub __init {
   #
   #
   if ( $indexed->size > 0 ) {
-    my $index = Devel::Ladybug::TextIndex->new({
-      index_dbh   => $class->__dbh,
-      collection  => join("_", $class->tableName, "idx"),
-      doc_fields  => $indexed->collect( sub {
-        my $field = shift;
+    my $index = Devel::Ladybug::TextIndex->new(
+      {
+        index_dbh  => $class->__dbh,
+        collection => join( "_", $class->tableName, "idx" ),
+        doc_fields => $indexed->collect(
+          sub {
+            my $field = shift;
 
-        Devel::Ladybug::Array::yield(lc($field));
-      } ),
-    });
+            Devel::Ladybug::Array::yield( lc($field) );
+          }
+        ),
+      }
+    );
 
-    $class->set("__textIndex", $index);
-    $class->set("__indexedFields", $indexed);
+    $class->set( "__textIndex",     $index );
+    $class->set( "__indexedFields", $indexed );
   }
 
   return true;
@@ -2368,13 +2361,12 @@ be used.
 
 =cut
 
-
 sub __dbUser {
   my $class = shift;
 
   if ( scalar(@_) ) {
     my $newValue = shift;
-    $class->set("__dbUser", $newValue);
+    $class->set( "__dbUser", $newValue );
   }
 
   return $class->get("__dbUser") || dbUser;
@@ -2385,7 +2377,7 @@ sub __dbPass {
 
   if ( scalar(@_) ) {
     my $newValue = shift;
-    $class->set("__dbPass", $newValue);
+    $class->set( "__dbPass", $newValue );
   }
 
   return $class->get("__dbPass") || dbPass;
@@ -2396,7 +2388,7 @@ sub __dbHost {
 
   if ( scalar(@_) ) {
     my $newValue = shift;
-    $class->set("__dbHost", $newValue);
+    $class->set( "__dbHost", $newValue );
   }
 
   return $class->get("__dbHost") || dbHost;
@@ -2407,12 +2399,11 @@ sub __dbPort {
 
   if ( scalar(@_) ) {
     my $newValue = shift;
-    $class->set("__dbPort", $newValue);
+    $class->set( "__dbPort", $newValue );
   }
 
   return $class->get("__dbPort") || dbPort;
 }
-
 
 =pod
 
@@ -2516,8 +2507,9 @@ sub remove {
       next if !$elementClass;
 
       $elementClass->write(
-        sprintf 'DELETE FROM %s WHERE %s = %s',
-        $elementClass->tableName, $class->__elementParentKey, $class->quote( $self->key ) );
+        sprintf 'DELETE FROM %s WHERE %s = %s', $elementClass->tableName,
+        $class->__elementParentKey,             $class->quote( $self->key )
+      );
     }
 
     #
@@ -2532,15 +2524,14 @@ sub remove {
       #
       # If this happens, freak out.
       #
-      throw Devel::Ladybug::TransactionFailed(
-        "COMMIT failed on remove");
+      throw Devel::Ladybug::TransactionFailed("COMMIT failed on remove");
     }
   }
 
   $self->_removeFromMemcached;
 
   my $index = $class->__textIndex;
-  if ( $index ) {
+  if ($index) {
     $self->_removeFromTextIndex($index);
   }
 
@@ -2748,8 +2739,7 @@ sub setIdsFromNames {
     #
 
   } else {
-    Devel::Ladybug::InvalidArgument->throw(
-      "$attr does not represent an ExtID");
+    Devel::Ladybug::InvalidArgument->throw("$attr does not represent an ExtID");
   }
 
   my $names = Devel::Ladybug::Array->new(@names);
@@ -2988,13 +2978,12 @@ sub _localSave {
       }
     } else {
       throw Devel::Ladybug::TransactionFailed(
-        "Save failed - $details\n  "
-          . $Devel::Ladybug::Persistence::errstr );
+        "Save failed - $details\n  " . $Devel::Ladybug::Persistence::errstr );
     }
   }
 
   my $index = $class->__textIndex;
-  if ( $index ) {
+  if ($index) {
     $self->_saveToTextIndex($index);
   }
 
@@ -3178,19 +3167,21 @@ Adds indexed values to this class's DBIx::TextIndex collection
 =cut
 
 sub _saveToTextIndex {
-  my $self = shift;
+  my $self  = shift;
   my $index = shift;
 
   return if !$self->exists;
   return if !$index;
 
-  my $save = { };
+  my $save = {};
 
-  $self->class->__indexedFields->each( sub {
-    my $field = shift;
+  $self->class->__indexedFields->each(
+    sub {
+      my $field = shift;
 
-    $save->{lc($field)} = $self->{$field};
-  } );
+      $save->{ lc($field) } = $self->{$field};
+    }
+  );
 
   my $key = $self->key;
 
@@ -3208,7 +3199,7 @@ Removes indexed values from this class's DBIx::TextIndex collection
 =cut
 
 sub _removeFromTextIndex {
-  my $self = shift;
+  my $self  = shift;
   my $index = shift;
 
   return if !$self->exists;
@@ -3269,9 +3260,7 @@ sub _updateRecord {
     #
     # If the ID was database-assigned (auto-increment), update self:
     #
-    if (
-      $class->asserts->{$priKey}->isa("Devel::Ladybug::Type::Serial") )
-    {
+    if ( $class->asserts->{$priKey}->isa("Devel::Ladybug::Type::Serial") ) {
       my $lastId =
         $class->__dbh->last_insert_id( undef, undef, $class->tableName,
         $priKey );
@@ -3347,8 +3336,7 @@ sub _path {
 
   my @caller = caller();
 
-  Devel::Ladybug::PrimaryKeyMissing->throw(
-    "Self has no primary key set")
+  Devel::Ladybug::PrimaryKeyMissing->throw("Self has no primary key set")
     if !defined $key;
 
   if ( UNIVERSAL::isa( $key, "Data::GUID" ) ) {
@@ -3432,8 +3420,8 @@ sub _rcsPath {
 
   my $joinStr = ( $class->__baseRcsPath() =~ /\/$/ ) ? '' : '/';
 
-  return sprintf( '%s%s',
-    join( $joinStr, $class->__baseRcsPath(), $key ), ',v' );
+  return
+    sprintf( '%s%s', join( $joinStr, $class->__baseRcsPath(), $key ), ',v' );
 }
 
 =pod
