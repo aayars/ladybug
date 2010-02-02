@@ -283,8 +283,17 @@ sub search {
     $query = { };
     $class->__indexedFields->each( sub {
       my $field = shift;
-      $query->{$field} = $text;
+
+      $query->{lc($field)} = $text;
     } );
+  } else {
+    my $lcQuery = { };
+
+    for my $field ( keys %{ $query } ) {
+      $lcQuery->{ lc($field) } = $query->{field};
+    }
+
+    $query = $lcQuery;
   }
 
   return Devel::Ladybug::Hash->new( $index->search($query) );
@@ -2289,7 +2298,11 @@ sub __init {
     my $index = DBIx::TextIndex->new({
       index_dbh   => $class->__dbh,
       collection  => join("_", $class->tableName, "idx"),
-      doc_fields  => $indexed,
+      doc_fields  => $indexed->collect( sub {
+        my $field = shift;
+
+        Devel::Ladybug::Array::yield(lc($field));
+      } ),
     });
 
     $class->set("__textIndex", $index);
@@ -3161,7 +3174,18 @@ sub _saveToTextIndex {
   my $self = shift;
   my $index = shift;
 
-  $index->add( $self->key => $self );
+  return if !$self->exists;
+  return if !$index;
+
+  my $save = { };
+
+  $self->class->__indexedFields->each( sub {
+    my $field = shift;
+
+    $save->{lc($field)} = $self->{$field};
+  } );
+
+  $index->add( $self->key => $save );
 }
 
 =pod
@@ -3175,6 +3199,9 @@ Removes indexed values from this class's DBIx::TextIndex collection
 sub _removeFromTextIndex {
   my $self = shift;
   my $index = shift;
+
+  return if !$self->exists;
+  return if !$index;
 
   $index->remove( $self->key );
 }

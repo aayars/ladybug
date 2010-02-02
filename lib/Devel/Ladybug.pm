@@ -216,14 +216,12 @@ e.g. "YourApp::YourClass".
 
 The top level namespace (eg "YourApp") translates, in lower case,
 to the name of the app's database. The database name may be overridden
-by implementing class method C<databaseName>. Devel::Ladybug does
-not create MySQL or PostgreSQL databases.
+by implementing class method C<databaseName>.
 
 Namespace elements beyond the top-level translate to lower case table
 names. In cases of nested namespaces, Perl's "::" delineator is swapped
 out for an underscore (_). The table name may be overridden by
-implementing class method C<tableName>. Devel::Ladybug creates any
-tables that it needs, automatically.
+implementing class method C<tableName>.
 
   create "YourApp::Example::Foo" => {
     # overrides default value of "yourapp"

@@ -58,7 +58,10 @@ sub connect {
   my $dsn = sprintf( 'dbi:Pg:database=%s;host=%s;port=%s',
     $args{database}, $args{host}, $args{port} );
 
-  return DBI->connect( $dsn, $args{user}, $args{pass}, { RaiseError => 1 } );
+  return DBI->connect( $dsn, $args{user}, $args{pass}, {
+    RaiseError => 1,
+    pg_server_prepare => 0,
+  } );
 }
 
 =pod
