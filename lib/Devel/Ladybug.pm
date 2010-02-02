@@ -101,17 +101,16 @@ Devel::Ladybug is a data modeling framework.
 
 Using Devel::Ladybug's C<create()> function, the developer asserts
 rules for object classes. Devel::Ladybug's purpose is to automatically
-derive a backing store, and to handle mapping and validation of
-input for classes created in this manner.
+derive a backing store, and to handle mapping and input validation for
+classes created in this manner.
 
-Devel::Ladybug works with YAML flatfile, MySQL/InnoDB, PostgreSQL,
-and SQLite. If the backing store type for a class is not specified,
-Devel::Ladybug tries to automatically determine an appropriate
-type for the local system.
+YAML flatfile, MySQL/InnoDB, PostgreSQL, and SQLite backing stores
+are supported. If the backing store type for a class is not specified,
+Devel::Ladybug tries to automatically determine an appropriate type
+for the local system.
 
-If memcached is available, Devel::Ladybug uses it in conjunction
-with the permanent backing store. When indexed fields are specified,
-Ladybug uses L<DBIx::TextIndex> to maintain a full-text index.
+Memcached, DBIx::TextIndex, and RCS can also be used in conjunction
+with a class's permanent backing store.
 
 See also: L<Devel::Ladybug::TLDR>
 
@@ -121,9 +120,9 @@ This documentation is for version B<0.407> of Devel::Ladybug.
 
 =head1 FRAMEWORK ASSUMPTIONS
 
-When using Devel::Ladybug, as with any framework, a number of things
-"just happen" by design. Trying to go against the flow of any of these
-base assumptions is not recommended.
+As with any framework, a number of things "just happen" by design.
+Trying to go against the flow of any of these base assumptions is
+not recommended.
 
 =head2 Configuration
 

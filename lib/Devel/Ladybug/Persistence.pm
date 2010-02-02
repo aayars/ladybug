@@ -3085,15 +3085,6 @@ sub _localSaveInsideTransaction {
   }
 
   #
-  # Remove the cached object, if using Memcached
-  #
-  if ( $class->__useMemcached() && $memd ) {
-    my $key = $class->__cacheKey( $self->key() );
-
-    $memd->delete($key);
-  }
-
-  #
   # Update the YAML backing store if using YAML
   #
   if ( $class->__useYaml() ) {
@@ -3155,8 +3146,11 @@ sub _saveToMemcached {
   my $cacheTTL = $class->__useMemcached();
 
   if ( $memd && $cacheTTL ) {
-    return $memd->set( $class->__cacheKey( $self->id ), $self,
-      $cacheTTL );
+    my $key = $class->__cacheKey( $self->key() );
+
+    $memd->delete($key);
+
+    return $memd->set( $key, $self, $cacheTTL );
   }
 
   return;
@@ -3185,7 +3179,11 @@ sub _saveToTextIndex {
     $save->{lc($field)} = $self->{$field};
   } );
 
-  $index->add( $self->key => $save );
+  my $key = $self->key;
+
+  $self->_removeFromTextIndex($index);
+
+  $index->add( $key => $save );
 }
 
 =pod
@@ -3203,7 +3201,7 @@ sub _removeFromTextIndex {
   return if !$self->exists;
   return if !$index;
 
-  $index->remove( $self->key );
+  eval { $index->remove( $self->key ); };
 }
 
 =pod
