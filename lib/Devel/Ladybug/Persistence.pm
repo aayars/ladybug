@@ -8,6 +8,24 @@
 # which accompanies this distribution, and is available at
 # http://opensource.org/licenses/cpl1.0.txt
 #
+package Devel::Ladybug::TextIndex;
+
+use strict;
+use warnings;
+
+use base qw| DBIx::TextIndex |;
+
+#
+#
+#
+sub remove {
+  my $self = shift;
+
+  return if ref($_[0]) && !$_->[0];
+
+  $self->SUPER::remove(@_);
+}
+
 package Devel::Ladybug::Persistence;
 
 =pod
@@ -46,7 +64,6 @@ use warnings;
 #
 use Cache::Memcached::Fast;
 use Clone qw| clone |;
-use DBIx::TextIndex;
 use Digest::SHA1 qw| sha1_hex |;
 use Error qw| :try |;
 use File::Copy;
@@ -2295,7 +2312,7 @@ sub __init {
   #
   #
   if ( $indexed->size > 0 ) {
-    my $index = DBIx::TextIndex->new({
+    my $index = Devel::Ladybug::TextIndex->new({
       index_dbh   => $class->__dbh,
       collection  => join("_", $class->tableName, "idx"),
       doc_fields  => $indexed->collect( sub {
@@ -2520,11 +2537,7 @@ sub remove {
     }
   }
 
-  if ( $memd && $class->__useMemcached() ) {
-    my $key = $class->__cacheKey( $self->key() );
-
-    $memd->delete($key);
-  }
+  $self->_removeFromMemcached;
 
   my $index = $class->__textIndex;
   if ( $index ) {
@@ -3146,9 +3159,9 @@ sub _saveToMemcached {
   my $cacheTTL = $class->__useMemcached();
 
   if ( $memd && $cacheTTL ) {
-    my $key = $class->__cacheKey( $self->key() );
+    $self->_removeFromMemcached;
 
-    $memd->delete($key);
+    my $key = $class->__cacheKey( $self->key() );
 
     return $memd->set( $key, $self, $cacheTTL );
   }
@@ -3201,7 +3214,27 @@ sub _removeFromTextIndex {
   return if !$self->exists;
   return if !$index;
 
-  eval { $index->remove( $self->key ); };
+  return $index->remove( $self->key );
+}
+
+=pod
+
+=item * $self->_removeFromMemcached
+
+Removes self's cached entry in memcached
+
+=cut
+
+sub _removeFromMemcached {
+  my $self = shift;
+
+  my $class = $self->class;
+
+  if ( $memd && $class->__useMemcached() ) {
+    my $key = $class->__cacheKey( $self->key() );
+
+    $memd->delete($key);
+  }
 }
 
 =pod
