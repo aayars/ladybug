@@ -257,36 +257,45 @@ sub set {
 
 =pod
 
-=item * $self->size()
+=item * $self->count
 
 Returns the number of key/value pairs in self
 
 =cut
 
 ### imported function size() is redef'd
-no warnings "redefine";
+do {
+  no warnings "redefine";
 
-sub size {
+  sub size {
+    my $self = shift;
+
+    warn "depracated usage, please use count() instead";
+
+    return scalar( CORE::keys( %{$self} ) );
+  }
+};
+
+sub count {
   my $self = shift;
 
   return scalar( CORE::keys( %{$self} ) );
 }
 
-use warnings "redefine";
 ###
 
 =pod
 
 =item * $self->isEmpty()
 
-Returns true if self's size is 0, otherwise false.
+Returns true if self's count is 0, otherwise false.
 
 =cut
 
 sub isEmpty {
   my $self = shift;
 
-  return $self->size() ? false : true;
+  return $self->count() ? false : true;
 }
 
 =pod

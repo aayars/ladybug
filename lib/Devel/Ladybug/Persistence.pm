@@ -318,6 +318,21 @@ sub search {
 
 =pod
 
+=item * $class->selectScalar($query)
+
+Returns the results of the received query, as a singular scalar value.
+
+=cut
+
+sub selectScalar {
+  my $class = shift;
+  my $query = shift;
+
+  return Devel::Ladybug::Scalar->new( $class->selectSingle($query)->shift );
+}
+
+=pod
+
 =item * $class->selectBool($query)
 
 Returns the results of the received query, as a binary true or false
@@ -329,7 +344,7 @@ sub selectBool {
   my $class = shift;
   my $query = shift;
 
-  return $class->selectSingle($query)->shift ? true : false;
+  return $class->selectScalar($query) ? true : false;
 }
 
 sub __selectBool {
@@ -499,6 +514,53 @@ sub allIds {
   $sth->finish();
 
   return $ids;
+}
+
+=pod
+
+=item * $class->count;
+
+Returns the number of rows in this class's backing store.
+
+=cut
+
+sub count {
+  my $class = shift;
+
+  if ( $class->__useYaml && !$class->__useDbi ) {
+    return $class->allIds->count;
+  }
+
+  return $class->selectScalar($class->__countStatement);
+}
+
+=pod
+
+=item * $class->tuples;
+
+Returns a L<Devel::Ladybug::Array> of all IDs and Names in this class.
+
+  my $tuples = $class->tuples;
+
+  $tuples->eachTuple( sub {
+    my $id = shift;
+    my $name = shift;
+
+    print "Have ID $id, Name $name\n";
+  } );
+
+=cut
+
+sub tuples {
+  my $class = shift;
+
+  if ( $class->__useYaml && !$class->__useDbi ) {
+    Devel::Ladybug::MethodIsAbstract->throw(
+      "tuples method not yet implemented for YAML backing stores"
+    );
+  }
+
+  return $class->selectMulti($class->__tupleStatement);
 }
 
 =pod
@@ -2300,7 +2362,7 @@ sub __init {
   #
   #
   #
-  if ( $indexed->size > 0 ) {
+  if ( $indexed->count > 0 ) {
     my $index = Devel::Ladybug::TextIndex->new(
       {
         index_dbh  => $class->__dbh,

@@ -172,27 +172,30 @@ sub set {
 
 =pod
 
-=item * $self->size()
+=item * $self->length
 
 Object wrapper for Perl's built-in C<length()> function. Functionally
 the same as C<length(@$ref)>.
 
   my $scalar = Devel::Ladybug::Scalar->new("Testing");
 
-  my $size = $scalar->size(); # returns 7
+  my $length = $scalar->length(); # returns 7
 
 =cut
 
 ### imported function size() is redef'd
-no warnings "redefine";
+do {
+  no warnings "redefine";
 
-sub size {
-  my $self = shift;
+  sub size {
+    my $self = shift;
 
-  return $self->length();
-}
+    warn "depracated usage, please use length() instead";
 
-use warnings "redefine";
+    return $self->length();
+  }
+};
+
 ###
 
 =pod
@@ -217,7 +220,7 @@ Returns a true value if self contains no values, otherwise false.
 sub isEmpty {
   my $self = shift;
 
-  return ( $self->size() == 0 );
+  return ( $self->length() == 0 );
 }
 
 =pod

@@ -454,6 +454,30 @@ sub __allIdsStatement {
   );
 }
 
+sub __countStatement {
+  my $class = shift;
+
+  return sprintf(
+    q|
+      SELECT count(*) AS total FROM %s
+    |,
+    $class->__selectTableName(),
+  );
+}
+
+sub __tupleStatement {
+  my $class = shift;
+
+  return sprintf(
+    q|
+      SELECT %s, %s FROM %s ORDER BY __name
+    |,
+    $class->__primaryKey,
+    $class->__concatNameStatement,
+    $class->tableName
+  );
+}
+
 sub __wrapWithReconnect {
   my $class = shift;
   my $sub   = shift;
@@ -842,6 +866,10 @@ Returns the SQL used to generate a list of all record names
 =item * $class->__allIdsStatement()
 
 Returns the SQL used to generate a list of all record ids
+
+=item * $class->__countStatement()
+
+Returns the SQL used to return the number of rows in a table
 
 =item * $class->__doesIdExistStatement($id)
 

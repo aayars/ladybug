@@ -352,14 +352,14 @@ sub push {
 
 =pod
 
-=item * $array->size()
+=item * $array->count()
 
 Object wrapper for Perl's built-in C<scalar()> function. Functionally
 the same as C<scalar(@$ref)>.
 
   my $array = Devel::Ladybug::Array->new( qw| foo bar | );
 
-  my $size = $array->size(); # returns 2
+  my $count = $array->count(); # returns 2
 
 =cut
 
@@ -371,9 +371,17 @@ do {
   sub size {
     my $self = shift;
 
+    warn "depracated usage, please use count() instead";
+
     return scalar( @{$self} );
   }
 };
+
+sub count {
+  my $self = shift;
+
+  return scalar( @{$self} );
+}
 
 =pod
 
@@ -754,6 +762,51 @@ sub eachWithIndex {
 
 =pod
 
+=item * $array->eachTuple($sub);
+
+Shorthand iterator for multi-dimensional arrays.
+
+  #
+  # $array looks like:
+  # [
+  #   [ "adam", "0" ],
+  #   [ "bob",  "1" ],
+  #   [ "carl", "2" ],
+  #   [ "dave", "3" ],
+  # ]
+  #
+
+  $array->eachTuple( sub {
+    my $first = shift;
+    my $second = shift;
+    # ...
+  } );
+
+  ###
+  ### The above was shorthand for:
+  ###
+  # $array->each( sub {
+  #   my $row = shift;
+  #   my $first = $row->shift;
+  #   my $second = $row->shift;
+  #   ...
+  # } );
+
+=cut
+
+sub eachTuple {
+  my $self = shift;
+  my $sub = shift;
+
+  return $self->collect( sub {
+    my $row = shift;
+
+    &$sub(@{ $row });
+  } );
+}
+
+=pod
+
 =item * $array->join($joinStr)
 
 Object wrapper for Perl's built-in C<join()> function. Functionally the
@@ -836,7 +889,7 @@ Returns a pseudo-random array element.
 sub rand {
   my $self = shift;
 
-  return $self->[ int( rand( $self->size() ) ) ];
+  return $self->[ int( rand( $self->count() ) ) ];
 }
 
 =pod
@@ -868,7 +921,7 @@ Returns a true value if self contains no values, otherwise false.
 sub isEmpty {
   my $self = shift;
 
-  return ( $self->size() == 0 );
+  return ( $self->count() == 0 );
 }
 
 =pod
@@ -963,11 +1016,11 @@ Removes all items, leaving self with zero array elements.
 
   my $array = Devel::Ladybug::Array->new( qw| foo bar | );
 
-  my $two = $array->size(); # 2
+  my $two = $array->count(); # 2
 
   $array->clear();
 
-  my $zero = $array->size(); # 0
+  my $zero = $array->count(); # 0
 
 =cut
 

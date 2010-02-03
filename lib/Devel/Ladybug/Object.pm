@@ -696,12 +696,12 @@ Removes all items, leaving self with zero elements.
     bar => "dos"
   );
 
-  print $object->size(); # 2
+  print $object->count(); # 2
   print "\n";
 
   $object->clear();
 
-  print $object->size(); # 0
+  print $object->count(); # 0
   print "\n";
 
 =cut

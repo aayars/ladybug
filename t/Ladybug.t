@@ -413,7 +413,7 @@ sub kickObjectTires {
         sprintf( '%s "%s"', $class->pretty($key), $obj->{$key} ) );
 
       if ( $obj->{$key}->isa("Devel::Ladybug::Array") ) {
-        is( $obj->{$key}->size(), 5, "Compare element count" );
+        is( $obj->{$key}->count, 5, "Compare element count" );
       }
     }
   );

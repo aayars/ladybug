@@ -327,7 +327,7 @@ To wit, native types are OK for constructors:
   say $example->someString->class;
   # "Devel::Ladybug::Str"
 
-  say $example->someString->size;
+  say $example->someString->length;
   # "3"
 
   say $example->someString;
