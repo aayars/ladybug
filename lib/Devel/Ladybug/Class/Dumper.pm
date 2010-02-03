@@ -290,7 +290,7 @@ sub escape {
       }
     );
   } elsif ( $self->isa("Devel::Ladybug::Array") ) {
-    $escaped = $self->collect(
+    $escaped = $self->each(
       sub {
         if ( UNIVERSAL::isa( $_, "Devel::Ladybug::Object" ) ) {
           Devel::Ladybug::Array::yield( $_->escape() );

@@ -88,64 +88,28 @@ sub assert {
 
 =over 4
 
-=item * $hash->collect($sub), yield(item, [item, ...]), emit(item, [item...])
+=item * $hash->each($sub), yield(item, [item, ...]), emit(item, [item...])
 
 Ruby-esque key iterator method. Returns a new L<Devel::Ladybug::Array>,
 containing the yielded results of calling the received sub for each key
 in $hash.
 
-$hash->collect is shorthand for $hash->keys->collect, so you're really
-calling C<collect> in L<Devel::Ladybug::Array>. C<yield> and C<emit>
+$hash->each is shorthand for $hash->keys->each, so you're really
+calling C<each> in L<Devel::Ladybug::Array>. C<yield> and C<emit>
 are exported by L<Devel::Ladybug::Array>. Please see the documentation
-for Devel::Ladybug::Array regarding usage of C<collect>, C<yield>, and
+for Devel::Ladybug::Array regarding usage of C<each>, C<yield>, and
 C<emit>.
 
   #
   # For example, quickly wrap <a> tags around array elements:
   #
-  my $tagged = $object->collect( sub {
+  my $tagged = $object->each( sub {
     my $key = shift;
 
     print "Key $key is $object->{$key}\n";
 
     emit "<a name=\"$key\">$object->{$key}</a>";
   } );
-
-=cut
-
-sub collect {
-  my $self = shift;
-  my $sub  = shift;
-
-  return $self->keys()->collect($sub);
-}
-
-=pod
-
-=item * $self->each($sub)
-
-List iterator method. Runs $sub for each element in self; returns true
-on success.
-
-  my $hash = Devel::Ladybug::Hash->new(
-    foo => "uno",
-    bar => "dos",
-    rebar => "tres"
-  );
-
-  $hash->each( sub {
-    my $key = shift;
-
-    print "Have key: $key, value: $hash->{$key}\n";
-  } );
-
-  #
-  # Expected output:
-  #
-  # Have key: foo, value: uno
-  # Have key: bar, value: dos
-  # Have key: rebar, value: tres
-  #
 
 =cut
 
@@ -195,7 +159,7 @@ alpha sorted by key.
 sub values {
   my $self = shift;
 
-  return $self->keys()->collect(
+  return $self->keys()->each(
     sub {
       my $key = shift;
 

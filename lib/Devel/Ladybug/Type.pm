@@ -1016,7 +1016,7 @@ sub __parseTypeArgs {
 sub subtype {
   my $rules = Devel::Ladybug::Hash->new(@_);
 
-  return $rules->collect(
+  return $rules->each(
     sub {
       my $key   = shift;
       my $value = $rules->{$key};

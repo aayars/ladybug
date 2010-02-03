@@ -12,7 +12,7 @@
 package Devel::Ladybug::Array::Break;
 
 #
-# Break may be thrown inside of collect() subs to make Devel::Ladybug stop
+# Break may be thrown inside of each() subs to make Devel::Ladybug stop
 # iterating through elements.
 #
 
@@ -385,22 +385,26 @@ sub count {
 
 =pod
 
-=item * $array->collect($sub)
+=item * $array->each($sub)
 
-=item * $array->collectWithIndex($sub)
+=item * $array->eachWithIndex($sub)
 
 =item * yield(item, [item, ...]), emit(item, [item, ...]), return, break
 
-List iterator method. C<collect> returns a new array with the results
+List iterator method. C<each> returns a new array with the results
 of running the received CODE block once for every element in the
 original. Returns the yielded/emitted results in a new
 Devel::Ladybug::Array instance.
 
-This Perl implementation of C<collect> is borrowed from Ruby.
-Devel::Ladybug employs several functions which may finely control the
-flow of execution.
+This Perl implementation of C<each> is borrowed from Ruby's
+implementation of C<collect> and C<each>.
 
-The collector pattern is used throughout Devel::Ladybug. The following
+To finely control the flow of execution when iterating, several
+functions may be used. These are C<yield>, C<emit>, C<break>, and
+Perl's own C<return>. These are explained in greater detail in the
+B<Collector Control Flow> section of this document.
+
+This collector pattern is used throughout Devel::Ladybug. The following
 pseudocode illustrates its possible usage.
 
   my $array = Devel::Ladybug::Array->new( ... );
@@ -423,18 +427,16 @@ pseudocode illustrates its possible usage.
                                     # and skips to next iteration
   };
  
-  my $results = $array->collect($sub);
+  my $results = $array->each($sub);
 
 A simple working example - return a new array containing capitalized
-versions of each element in the original. Collection is performed using
-C<collect>; C<each> may be used when there is code to run with no
-return values.
+versions of each element in the original.
 
   my $array = Devel::Ladybug::Array->new( qw|
     foo bar baz whiskey tango foxtrot
   | );
 
-  my $capped = $array->collect( sub {
+  my $capped = $array->each( sub {
     my $item = shift;
 
     yield uc($item)
@@ -449,13 +451,13 @@ return values.
 
 B<Collector Control Flow>
 
-The flow of the collect sub may be controlled using C<return>,
+The flow of the C<each> sub may be controlled using C<return>,
 C<yield>, C<emit>, and C<break>.
 
-C<break> invokes Perl's C<last>, breaking execution of the C<collect>
+C<break> invokes Perl's C<last>, breaking execution of the C<each>
 loop.
 
-In the context of the collect sub, C<return> is like Perl's C<next> or
+In the context of the C<each> sub, C<return> is like Perl's C<next> or
 Javascript's C<continue>- that is, it stops execution of the sub in
 progress, and continues on to the next iteration. Because Perl subs
 always end with an implicit return, using C<return> to reap yielded
@@ -463,37 +465,39 @@ elements is not workable, so we use C<yield> for this instead. Any
 arguments to C<return> in this context are ignored.
 
 Like C<return>, C<yield> stops execution of the sub in progress, but
-items passed as arguments to C<yield> are added to the new array
-returned by C<collect>.
+unlike C<return>, items passed as arguments to C<yield> are added
+to the end of the returned array.
 
-C<emit> adds items to the returned array, but does so without returning
-from the sub in progress. Emitted items are added to the array returned
-by the collect sub, just like C<yield>, but you may call C<emit> as
-many times as needed per iteration, without breaking execution.
+C<emit> adds items to the returned array, and then resumes execution
+of the sub in progress. Emitted items are added to the array returned
+by the C<each> sub, just like C<yield>, but you may call C<emit>
+as many times as needed per iteration, without breaking execution.
 
-If nothing is yielded or emitted by the collect sub in an iteration,
+If nothing is yielded or emitted by the C<each> sub in an iteration,
 nothing will be added to the returned array for that item. To yield
-nothing for an iteration, don't C<yield(undef)>, just don't C<yield>--
-Rather, use C<return> instead, to avoid undefined elements in the
-returned array.
+nothing for an iteration, don't use C<yield>. If you must, use
+C<return> instead to skip ahead to the next iteration, to avoid
+undefined elements in the returned array.
 
 If yielding multiple items at a time, they are added to the array
-returned by C<collect> in a "flat" manner-- that is, no array nesting
+returned by C<each> in a "flat" manner-- that is, no array nesting
 will occur unless the yielded data is explicitly structured as such.
 
 B<Recap: Return vs Yield vs Emit>
 
-C<yield> adds items to the array returned by the collect sub, in
+C<yield> adds items to the array returned by the C<each> sub, in
 addition to causing Perl to jump ahead to the next iteration, like
-C<next> in a C<for> loop would. Remember, C<return> just returns
-without adding anything to the return array-- use it in cases where you
+C<next> in a C<for> loop would. 
+
+C<return> just returns without adding anything to the return array--
+use it in cases where you
 just want to  skip ahead without yielding items (ie C<next>).
 
   #
   # Create a new Array ($quoted) containing quoted elements
   # from the original, omitting items which aren't wanted.
   #
-  my $quoted = $array->collect( sub {
+  my $quoted = $array->each( sub {
     my $item = shift;
 
     print "Have item: $item\n";
@@ -523,20 +527,16 @@ just want to  skip ahead without yielding items (ie C<next>).
   }
 
 
-C<emit> adds items to the array returned by the collect sub, but does
+C<emit> adds items to the array returned by the C<each> sub, but does
 so without returning (that is, execution of the sub in progress will
 continue uninterrupted). It's just like C<push>ing to an array from
 inside a C<for> loop, because that's exactly what it does.
-
-The only functional difference between the preceding example for
-C<yield> and the below example for C<emit> is that using C<emit> lets
-the interpreter get to that final C<print> statement.
 
   #
   # For example, create a new Array ($quoted) containing quoted elements
   # from the original, omitting items which aren't wanted.
   #
-  my $quoted = $array->collect( sub {
+  my $quoted = $array->each( sub {
     my $item = shift;
 
     print "Have item: $item\n";
@@ -563,10 +563,10 @@ the interpreter get to that final C<print> statement.
     print "You will *always* get here!\n";
   }
 
-The indexed version of C<collect> is C<collectWithIndex>. It provides
+The indexed version of C<each> is C<eachWithIndex>. It provides
 the index integer as a second argument to the received CODE block.
 
-  my $new = $array->collectWithIndex( sub {
+  my $new = $array->eachWithIndex( sub {
     my $item = shift;
     my $index = shift;
 
@@ -576,6 +576,22 @@ the index integer as a second argument to the received CODE block.
 =cut
 
 sub collect {
+  my $self = shift;
+
+  warn "depracated usage, please use each() instead";
+
+  return $self->each(@_);
+}
+
+sub collectWithIndex {
+  my $self = shift;
+
+  warn "depracated usage, please use eachWithIndex() instead";
+
+  return $self->each(@_);
+}
+
+sub each {
   my $self      = shift;
   my $sub       = shift;
   my $withIndex = shift;
@@ -634,11 +650,11 @@ sub collect {
   return $Devel::Ladybug::Array::EmittedItems;
 }
 
-sub collectWithIndex {
+sub eachWithIndex {
   my $self = shift;
   my $sub  = shift;
 
-  return $self->collect( $sub, true );
+  return $self->each( $sub, true );
 }
 
 # sub emit(*@results) {
@@ -653,111 +669,6 @@ sub yield {
 
 sub break {
   Devel::Ladybug::Array::Break->throw("");
-}
-
-=pod
-
-=item * $array->each($sub)
-
-=item * $array->eachWithIndex($sub)
-
-=item * return, break
-
-List iterator method. Runs $sub for each element in self; returns true
-on success.
-
-Just as in C<collect>, C<return> skips to the next iteration, and
-C<break> breaks the loop. Array elements are accessed in the same
-manner as C<collect>.
-
-
-  my $arr = Devel::Ladybug::Array->new( qw| foo bar rebar | );
-
-  $arr->each( sub {
-    my $item = shift;
-
-    print "Have item: $item\n";
-  } );
-
-  #
-  # Expected output:
-  #
-  # Have item: foo
-  # Have item: bar
-  # Have item: rebar
-  #
-
-The indexed version of C<each> is C<eachWithIndex>. It provides the
-index integer as a second argument to the received CODE block.
-
-  $array->eachWithIndex( sub {
-    my $item = shift;
-    my $index = shift;
-
-    print "Have item $index: $item\n";
-  } );
-
-  #
-  # Expected output:
-  #
-  # Have item 0: foo
-  # Have item 1: bar
-  # Have item 2: rebar
-  #
-
-=cut
-
-sub each {
-  my $self      = shift;
-  my $sub       = shift;
-  my $withIndex = shift;
-
-  my $i = 0;
-
-  for ( @{$self} ) {
-    if ($withIndex) {
-      eval { &{$sub}( $_, $i ); };
-    } else {
-      eval { &{$sub}($_); };
-    }
-
-    $i++;
-
-    if ($@) {
-      my $thrown = $Error::THROWN;
-
-      if ( $thrown
-        && UNIVERSAL::isa( $thrown, "Devel::Ladybug::Array::Break" ) )
-      {
-
-        #
-        # "break" was called
-        #
-        last;
-      } elsif ( $thrown && UNIVERSAL::isa( $thrown, "Error" ) ) {
-
-        #
-        # Rethrow
-        #
-        $thrown->throw();
-      } else {
-
-        #
-        # Normal error encountered, just die
-        #
-        die $@;
-      }
-    }
-  }
-
-  return true;
-}
-
-sub eachWithIndex {
-  my $self = shift;
-  my $sub  = shift;
-
-  return $self->each( $sub, true );
 }
 
 =pod
@@ -798,7 +709,7 @@ sub eachTuple {
   my $self = shift;
   my $sub = shift;
 
-  return $self->collect( sub {
+  return $self->each( sub {
     my $row = shift;
 
     &$sub(@{ $row });
@@ -1214,7 +1125,7 @@ sub stddev {
   my $avg = $self->average;
 
   return sqrt(
-    $self->collect(
+    $self->each(
       sub {
         my $i = shift;
 

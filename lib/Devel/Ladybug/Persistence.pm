@@ -2367,7 +2367,7 @@ sub __init {
       {
         index_dbh  => $class->__dbh,
         collection => join( "_", $class->tableName, "idx" ),
-        doc_fields => $indexed->collect(
+        doc_fields => $indexed->each(
           sub {
             my $field = shift;
 
@@ -2808,7 +2808,7 @@ sub setIdsFromNames {
 
   my $extClass = $type->externalClass;
 
-  my $newIds = $names->collect(
+  my $newIds = $names->each(
     sub {
       my $obj = $extClass->spawn($_);
 

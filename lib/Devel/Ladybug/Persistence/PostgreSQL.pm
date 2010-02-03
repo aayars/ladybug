@@ -285,7 +285,7 @@ sub __selectColumnNames {
 
   my $asserts = $class->asserts();
 
-  return $class->columnNames->collect(
+  return $class->columnNames->each(
     sub {
       my $attr = shift;
 
@@ -315,7 +315,7 @@ sub __updateColumnNames {
 
   my $priKey = $class->__primaryKey;
 
-  return $class->columnNames->collect(
+  return $class->columnNames->each(
     sub {
       my $name = shift;
 
@@ -336,7 +336,7 @@ sub __insertColumnNames {
   # Omit "id" from the SQL statement if we're using auto-increment
   #
   if ( $class->asserts->{$priKey}->isa("Devel::Ladybug::Type::Serial") ) {
-    return $class->columnNames->collect(
+    return $class->columnNames->each(
       sub {
         my $name = shift;
 
@@ -347,7 +347,7 @@ sub __insertColumnNames {
     );
 
   } else {
-    return $class->columnNames->collect( sub {
+    return $class->columnNames->each( sub {
       my $name = shift;
 
       Devel::Ladybug::Array::yield("\"$name\"");

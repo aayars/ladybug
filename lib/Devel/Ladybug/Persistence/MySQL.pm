@@ -147,7 +147,7 @@ sub __schema {
   } else {
     $schema->push( sprintf( '  PRIMARY KEY(%s),', $primaryKey ) );
 
-    my $uniqueStatement = $unique->collect(
+    my $uniqueStatement = $unique->each(
       sub {
         my $key       = $_;
         my $multiples = $unique->{$key};
@@ -198,7 +198,7 @@ sub __schema {
     $schema->push("  ,");
 
     $schema->push(
-      $foreign->collect(
+      $foreign->each(
         sub {
           my $key  = $_;
           my $type = $asserts->{$key};
