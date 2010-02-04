@@ -97,22 +97,14 @@ examples.
 
 =head1 DESCRIPTION
 
-Devel::Ladybug is a data modeling framework.
+Using the C<create()> function, developers may assert rules for
+classes. Devel::Ladybug creates a permanent backing store for these
+classes, and can also handle object-relational mapping and input
+validation.
 
-Using Devel::Ladybug's C<create()> function, the developer asserts
-rules for object classes. Devel::Ladybug's purpose is to automatically
-derive a backing store, and to handle mapping and input validation for
-classes created in this manner.
-
-YAML flatfile, MySQL/InnoDB, PostgreSQL, and SQLite backing stores
-are supported. If the backing store type for a class is not specified,
-Devel::Ladybug tries to automatically determine an appropriate type
-for the local system.
-
-Memcached, DBIx::TextIndex, and RCS can also be used in conjunction
-with a class's permanent backing store.
-
-See also: L<Devel::Ladybug::TLDR>
+YAML flatfile, MySQL/InnoDB, PostgreSQL, and SQLite are supported.
+Memcached, DBIx::TextIndex, and RCS may be used in conjunction with
+the permanent backing store.
 
 =head1 VERSION
 
@@ -128,7 +120,7 @@ not recommended.
 
 See CONFIGURATION AND ENVIRONMENT in this document.
 
-=head2 Classes Make Tables
+=head2 Table Creation
 
 Database schemas are derived from the assertions contained
 in object classes. Devel::Ladybug creates any needed tables.
@@ -592,6 +584,8 @@ the output from C<make test>)
   http://static.cpantesters.org/distro/D/Devel-Ladybug.html
 
 =head1 SEE ALSO
+
+L<Devel::Ladybug::TLDR>
 
 L<Devel::Ladybug::Class>
 

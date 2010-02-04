@@ -64,7 +64,7 @@ do {
     testInt      => 23,
     testNum      => 42,
     testRule     => qr/foo/,
-    testStr      => "example",
+    testStr      => "☃☃☃ - example - ☃☃☃",
     testStr2     => "the rain in spain falls gently",
     testTimeSpan => 60 * 24,
   );
@@ -357,8 +357,7 @@ sub kickClassTires {
     $ids->each( sub {
       my $id = shift;
       my $obj;
-      isa_ok( $obj = $class->load($id),
-        $class, "Object retrieved from backing store" );
+      isa_ok( $obj = $class->load($id), $class );
 
       kickObjectTires($obj);
     } );
@@ -375,8 +374,7 @@ sub kickClassTires {
       my $id = shift;
 
       my $obj;
-      isa_ok( $obj = $class->load($id),
-        $class, "Object retrieved from backing store" );
+      isa_ok( $obj = $class->load($id), $class );
 
       kickObjectTires($obj);
 
@@ -416,16 +414,15 @@ sub kickObjectTires {
       my $type = $asserts->{$key};
 
       if ( exists $instancePrototype{$key} ) {
-        ok( $obj->{$key} == $instancePrototype{$key},
-          "$class: $key (\"$obj->{$key}\") matches (\"$instancePrototype{$key}\")"
-        );
-        ok( ( $obj->{$key} ne "Bogus Crap" ) && ( $obj->{$key} ne [ "Bogus Crap" ] ),
-          "$class: $key (\"$obj->{$key}\") != bogus crap"
+        ok(
+          ( $obj->{$key} == $instancePrototype{$key} )
+           && ( $obj->{$key} ne "Bogus Crap" )
+           && ( $obj->{$key} ne [ "Bogus Crap" ] ),
+          "$class: $key matches orig value"
         );
       }
 
-      isa_ok( $obj->{$key}, $type->objectClass,
-        sprintf( '%s "%s"', $class->pretty($key), $obj->{$key} ) );
+      isa_ok( $obj->{$key}, $type->objectClass );
 
       if ( $obj->{$key}->isa("Devel::Ladybug::Array") ) {
         is( $obj->{$key}->count, 5, "Compare element count" );
