@@ -277,7 +277,7 @@ sub escape {
 
   my $escaped;
 
-  if ( $self->isa("Devel::Ladybug::Hash") ) {
+  if ( $self->isa("Devel::Ladybug::Hash") && !$self->isa("Devel::Ladybug::Node") ) {
     $escaped = Devel::Ladybug::Hash->new;
 
     $self->each(

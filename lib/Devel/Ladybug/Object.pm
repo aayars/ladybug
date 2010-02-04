@@ -342,9 +342,9 @@ sub isAttributeAllowed {
     if ( exists $asserts->{$key} ) {
       return true;
     } else {
-      my $caller = caller();
+      my ($caller,$pkg,$line) = caller();
       warn
-        "BUG (Check $caller): \"$key\" is not a member of \"$class\"";
+        "BUG (Check $caller:$line): \"$key\" is not a member of \"$class\"";
       return false;
     }
   } else {
@@ -637,8 +637,12 @@ sub get {
   my $class = $self->class();
 
   if ($class) {
-    throw Devel::Ladybug::RuntimeError("$key is not a member of $class")
-      if !$class->isAttributeAllowed($key);
+    if ( !$class->isAttributeAllowed($key) ) {
+      my ($caller,$pkg,$line) = caller();
+      Devel::Ladybug::RuntimeError->throw(
+        "BUG (Check $caller:$line): $self does not answer to $key"
+      );
+    }
 
     return $self->{$key};
   } else {

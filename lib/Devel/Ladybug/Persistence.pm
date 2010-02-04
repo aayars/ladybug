@@ -88,6 +88,7 @@ use Devel::Ladybug::Constants qw|
   |;
 use Devel::Ladybug::Enum::DBIType;
 use Devel::Ladybug::Exceptions;
+use Devel::Ladybug::Stream;
 use Devel::Ladybug::Utility;
 
 #
@@ -471,8 +472,7 @@ sub __selectMulti {
 
 =item * $class->allIds()
 
-Returns a Devel::Ladybug::Array of all object ids in the receiving
-class.
+Returns a L<Devel::Ladybug::Array> of all IDs in the receiving class.
 
   my $ids = $class->allIds();
 
@@ -536,9 +536,71 @@ sub count {
 
 =pod
 
-=item * $class->tuples;
+=item * $class->stream
 
-Returns a L<Devel::Ladybug::Array> of all IDs and Names in this class.
+Returns a L<Devel::Ladybug::Stream> of all IDs and Names in this table.
+
+  my $stream = $class->stream;
+
+  $stream->eachTuple( sub {
+    my $id = shift;
+    my $name = shift;
+
+    print "Have ID $id, Name $name\n";
+  } );
+
+=cut
+
+sub stream {
+  my $class = shift;
+  my $sub = shift;
+
+  my $stream = Devel::Ladybug::Stream->new($class);
+
+  return $stream;
+}
+
+=pod
+
+=item * $class->each
+
+Iterator for each ID in the current class.
+
+See collector usage in L<Array::Ladybug::Array> docs.
+
+  $class->each( sub {
+    my $id = shift;
+
+    my $obj = $class->load($id);
+  } );
+
+=cut
+
+sub each {
+  my $class = shift;
+  my $sub = shift;
+
+  #
+  # Delegate for instance method usage:
+  #
+  return Devel::Ladybug::Hash::each($class, $sub) if $class->class;
+
+  if ( $class->__useYaml && !$class->__useDbi ) {
+    return $class->allIds->each($sub);
+  }
+
+  my $stream = $class->stream;
+
+  $stream->setQuery( $class->__allIdsStatement );
+
+  return $stream->eachTuple($sub);
+}
+
+=pod
+
+=item * $class->tuples
+
+Returns a L<Devel::Ladybug::Array> of all IDs and Names in this table.
 
   my $tuples = $class->tuples;
 

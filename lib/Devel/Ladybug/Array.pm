@@ -387,8 +387,6 @@ sub count {
 
 =item * $array->each($sub)
 
-=item * $array->eachWithIndex($sub)
-
 =item * yield(item, [item, ...]), emit(item, [item, ...]), return, break
 
 List iterator method. C<each> returns a new array with the results
@@ -563,10 +561,10 @@ inside a C<for> loop, because that's exactly what it does.
     print "You will *always* get here!\n";
   }
 
-The indexed version of C<each> is C<eachWithIndex>. It provides
-the index integer as a second argument to the received CODE block.
+C<each> provides the index integer as a second argument to the
+received CODE block.
 
-  my $new = $array->eachWithIndex( sub {
+  my $new = $array->each( sub {
     my $item = shift;
     my $index = shift;
 
@@ -586,7 +584,7 @@ sub collect {
 sub collectWithIndex {
   my $self = shift;
 
-  warn "depracated usage, please use eachWithIndex() instead";
+  warn "depracated usage, please use each() instead";
 
   return $self->each(@_);
 }
@@ -594,7 +592,6 @@ sub collectWithIndex {
 sub each {
   my $self      = shift;
   my $sub       = shift;
-  my $withIndex = shift;
 
   my $i = 0;
 
@@ -604,11 +601,7 @@ sub each {
   for ( @{$self} ) {
     local $Error::THROWN = undef;
 
-    if ($withIndex) {
-      eval { &$sub( $_, $i ) };
-    } else {
-      eval { &$sub($_) };
-    }
+    eval { &$sub( $_, $i ) };
 
     $i++;
 
@@ -652,9 +645,10 @@ sub each {
 
 sub eachWithIndex {
   my $self = shift;
-  my $sub  = shift;
 
-  return $self->each( $sub, true );
+  warn "depracated usage, please use each() instead";
+
+  return $self->each(@_);
 }
 
 # sub emit(*@results) {
@@ -712,7 +706,11 @@ sub eachTuple {
   return $self->each( sub {
     my $row = shift;
 
-    &$sub(@{ $row });
+    if ( UNIVERSAL::isa($row, "ARRAY") ) {
+      &$sub(@{ $row });
+    } else {
+      &$sub($row);
+    }
   } );
 }
 

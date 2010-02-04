@@ -36,6 +36,7 @@ lib/Devel/Ladybug/Runtime.pm
 lib/Devel/Ladybug/Scalar.pm
 lib/Devel/Ladybug/Serial.pm
 lib/Devel/Ladybug/Str.pm
+lib/Devel/Ladybug/Stream.pm
 lib/Devel/Ladybug/Subtype.pm
 lib/Devel/Ladybug/TimeSpan.pm
 lib/Devel/Ladybug/Type.pm
