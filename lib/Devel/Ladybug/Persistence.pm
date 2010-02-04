@@ -566,7 +566,7 @@ sub stream {
 
 Iterator for each ID in the current class.
 
-See collector usage in L<Array::Ladybug::Array> docs.
+See collector usage in L<Devel::Ladybug::Array> docs.
 
   $class->each( sub {
     my $id = shift;
