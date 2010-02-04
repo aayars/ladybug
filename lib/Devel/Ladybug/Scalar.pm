@@ -29,7 +29,9 @@ use overload
   my $second = shift;
 
   "$first" eq "$second";
-  };
+  },
+  '==' => sub { shift eq shift },
+  '!=' => sub { shift eq shift };
 
 use base qw| Devel::Ladybug::Class::Dumper Devel::Ladybug::Object |;
 
@@ -92,7 +94,7 @@ sub new {
 # throw Devel::Ladybug::InvalidArgument("$class instances may not be undefined")
 #  if !defined $self;
 
-  Devel::Ladybug::Type::insist $self, Devel::Ladybug::Type::isScalar;
+# Devel::Ladybug::Type::insist $self, Devel::Ladybug::Type::isScalar;
 
   if ( ref($self) && overload::Overloaded($self) ) {
     return bless $self, $class;    # ONE OF US NOW
@@ -109,7 +111,7 @@ sub assert {
   my @rules = @_;
 
   my %parsed =
-    Devel::Ladybug::Type::__parseTypeArgs( Devel::Ladybug::Type::isScalar,
+    Devel::Ladybug::Type::__parseTypeArgs( sub { 1 },
     @rules );
 
   return $class->__assertClass()->new(%parsed);

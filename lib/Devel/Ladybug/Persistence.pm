@@ -2199,7 +2199,7 @@ sub __loadYamlFromId {
   my $class = shift;
   my $id    = shift;
 
-  if ( UNIVERSAL::isa( $id, "Data::GUID" ) ) {
+  if ( UNIVERSAL::can( $id, "as_string" ) ) {
     $id = $id->as_string();
   }
 
@@ -3463,7 +3463,7 @@ sub _path {
   Devel::Ladybug::PrimaryKeyMissing->throw("Self has no primary key set")
     if !defined $key;
 
-  if ( UNIVERSAL::isa( $key, "Data::GUID" ) ) {
+  if ( UNIVERSAL::can( $key, "as_string" ) ) {
     $key = $key->as_string();
   }
 
@@ -3495,7 +3495,7 @@ sub _saveToPath {
   }
 
   my $id = $self->key();
-  if ( UNIVERSAL::isa( $id, "Data::GUID" ) ) {
+  if ( UNIVERSAL::can( $id, "as_string" ) ) {
     $id = $id->as_string();
   }
 

@@ -98,6 +98,45 @@ use Devel::Ladybug::Class qw| true false |;
 use base
   qw| Exporter Devel::Ladybug::Class::Dumper Devel::Ladybug::Object |;
 
+use overload
+  '""' => sub { return shift },
+  '==' => sub { compare(shift, shift) },
+  'eq' => sub { compare(shift, shift) },
+  '!=' => sub { !compare(shift, shift) },
+  'ne' => sub { !compare(shift, shift) };
+
+sub compare {
+    my $first = shift;
+    my $second = shift;
+
+    if ( !UNIVERSAL::isa($first,"ARRAY") || !UNIVERSAL::isa($second,"ARRAY") ) {
+      return false;
+    }
+
+    my $Asize = scalar(@{ $first });
+    my $Bsize = scalar(@{ $second });
+
+    if ( $Asize != $Bsize ) { return false; }
+
+    my $i = 0;
+
+    for ( @{ $first } ) {
+      my $A = $first->[$i];
+      my $B = $second->[$i];
+
+      if (
+        Scalar::Util::looks_like_number($A)
+         && Scalar::Util::looks_like_number($B)
+      ) {
+        return false if "$A" != "$B";
+      } else {
+        return false if "$A" ne "$B";
+      }
+    }
+
+    return true;
+  };
+
 our @EXPORT_OK = qw| yield emit break |;
 
 sub value {

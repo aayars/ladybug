@@ -339,6 +339,7 @@ sub assert {
           $memberClass->__primaryKey, $memberClass->quote($value)
         );
 
+
         $exists = $externalClass->selectBool($q);
       } else {
         $exists = $memberClass->doesIdExist($value);

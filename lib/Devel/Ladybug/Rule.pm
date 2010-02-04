@@ -17,7 +17,7 @@ Devel::Ladybug::Rule - Object class for regular expressions
 
 =head1 DESCRIPTION
 
-Extends L<Devel::Ladybug::Str>
+Extends L<Devel::Ladybug::Scalar>
 
 =head1 SYNOPSIS
 
@@ -36,15 +36,7 @@ use warnings;
 
 use Devel::Ladybug::Enum::Bool;
 
-use overload '=~' => sub {
-  my $self  = shift;
-  my $value = shift;
-  my $reg   = qr/$self/x;
-
-  return $value =~ /$reg/;
-};
-
-use base qw| Devel::Ladybug::Str |;
+use base qw| Devel::Ladybug::Scalar |;
 
 sub assert {
   my $class = shift;
@@ -55,6 +47,19 @@ sub assert {
     @rules );
 
   return $class->__assertClass()->new(%parsed);
+}
+
+sub new {
+  my $class = shift;
+  my $self  = shift;
+
+  Devel::Ladybug::Type::insist $self, Devel::Ladybug::Type::isRule;
+
+  if ( ref($self) && overload::Overloaded($self) ) {
+    return bless $self, $class;    # ONE OF US NOW
+  } else {
+    return bless \$self, $class;
+  }
 }
 
 sub isa {

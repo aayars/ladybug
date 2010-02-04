@@ -368,6 +368,8 @@ sub kickClassTires {
 
   my $count = $class->count;
 
+  ok( $count > 0, "Count from backing store is > 0" );
+
   $class->each(
     sub {
       my $id = shift;
@@ -412,6 +414,15 @@ sub kickObjectTires {
     sub {
       my $key  = shift;
       my $type = $asserts->{$key};
+
+      if ( exists $instancePrototype{$key} ) {
+        ok( $obj->{$key} == $instancePrototype{$key},
+          "$class: $key (\"$obj->{$key}\") matches (\"$instancePrototype{$key}\")"
+        );
+        ok( ( $obj->{$key} ne "Bogus Crap" ) && ( $obj->{$key} ne [ "Bogus Crap" ] ),
+          "$class: $key (\"$obj->{$key}\") != bogus crap"
+        );
+      }
 
       isa_ok( $obj->{$key}, $type->objectClass,
         sprintf( '%s "%s"', $class->pretty($key), $obj->{$key} ) );

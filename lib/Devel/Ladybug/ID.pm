@@ -65,30 +65,37 @@ use Devel::Ladybug::Enum::Bool;
 
 use URI::Escape;
 
-use overload
-  fallback => true,
-  '""'     => sub { shift->as_base64() };
+use Data::GUID;
 
-use base qw| Data::GUID Devel::Ladybug::Scalar |;
+use base qw| Devel::Ladybug::Scalar |;
+# use base qw| Data::GUID Devel::Ladybug::Scalar |;
+
+#  '""'     => sub { shift->as_base64() };
 
 sub new {
   my $class = shift;
   my $self  = shift;
 
+  my $guid;
+
   if ($self) {
     my $len = length("$self");
 
     if ( $len == 36 ) {
-      return Data::GUID::from_string( $class, $self );
+      $guid = Data::GUID->from_string($self);
     } elsif ( $len == 24 ) {
-      return Data::GUID::from_base64( $class, $self );
+      $guid = Data::GUID->from_base64($self);
     } else {
       Devel::Ladybug::AssertFailed->throw(
         "Unrecognized ID format: \"$self\"");
     }
+  } else {
+    $guid = Data::GUID->new(),
   }
 
-  return Data::GUID::new($class);
+  $self = $guid->as_base64;
+
+  return bless \$self, $class;
 }
 
 sub assert {
@@ -113,6 +120,12 @@ sub escaped {
   my $self = shift;
 
   return uri_escape( $self->as_base64 );
+}
+
+sub as_string {
+  my $self = shift;
+
+  return Data::GUID->from_base64($self)->as_string;
 }
 
 true;

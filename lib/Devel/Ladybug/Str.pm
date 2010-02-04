@@ -77,7 +77,7 @@ package Devel::Ladybug::Str;
 use strict;
 use warnings;
 
-use base qw| Unicode::String Devel::Ladybug::Scalar MIME::Base64 |;
+use base qw| Devel::Ladybug::Scalar |;
 
 sub assert {
   my $class = shift;
