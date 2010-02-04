@@ -62,6 +62,9 @@ found in the %Devel::Ladybug::Type::RULES package variable.
 
 =head1 SUBTYPE ARGS
 
+Many subtype args affect database schema attributes. If changed
+after the table exists, the table should be re-created or altered.
+
 Instance variable assertions may be modified by providing the following
 arguments to subtype():
 

@@ -40,17 +40,6 @@ load time, and the necessary rule subclasses are created dynamically.
 
 See L<Devel::Ladybug::Type> for a full list of available subtype args.
 
-=head1 SCHEMA ADVISEMENT
-
-Many of these rules affect database schema attributes-- meaning if you
-change them after the table already exists, the table will need to be
-administratively ALTERed (or moved aside to a new name, re-created, and
-migrated). A class's table is created when its package is loaded for
-the first time.
-
-Schema updates should be performed using carefully reviewed commands.
-Always back up the current table before executing an ALTER.
-
 =head1 PUBLIC INSTANCE METHODS
 
 =over 4
