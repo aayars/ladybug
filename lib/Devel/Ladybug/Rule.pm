@@ -55,12 +55,10 @@ sub new {
 
   Devel::Ladybug::Type::insist $self, Devel::Ladybug::Type::isRule;
 
-  if ( ref($self) && overload::Overloaded($self) ) {
-    return bless $self, $class;    # ONE OF US NOW
-  } else {
-    return bless \$self, $class;
-  }
-}
+  my $regex = "$self";
+
+  return bless \$regex, $class;
+}  
 
 sub isa {
   my $class = shift;
