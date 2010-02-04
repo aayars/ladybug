@@ -483,7 +483,7 @@ arguments to the C<assert> method.
 
 Instance variables may be augmented with subtyping rules using the
 C<subtype> function, which is also sent as an argument to C<assert>.
-See Devel::Ladybug::Subtype for a list of allowed subtype arguments.
+See L<Devel::Ladybug::Type> for a list of allowed subtype arguments.
 
   create "YourApp::Example" => {
     favoriteColor  => Devel::Ladybug::Str->assert(
@@ -630,10 +630,6 @@ built-in runtime assertions-- simple but powerful rules in the class
 prototype which define runtime and schema attributes. See the
 L<Devel::Ladybug::Type> module for more about assertions.
 
-Devel::Ladybug classes are regular old Perl packages. C<create()> is
-just a wrapper to the C<package> keyword, with some shortcuts thrown
-in.
-
   use Devel::Ladybug qw| :all |;
 
   create "YourApp::Example" => {
@@ -672,7 +668,7 @@ in.
 
 =head1 SEE ALSO
 
-L<Devel::Ladybug::Type>, L<Devel::Ladybug::Subtype>
+L<Devel::Ladybug::Type>
 
 This file is part of L<Devel::Ladybug>.
 

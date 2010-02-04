@@ -471,9 +471,7 @@ This imports each of the symbols listed below.
 
 =item * :create
 
-This imports the C<create> and C<subtype> class prototyping functions;
-see L<Devel::Ladybug::Class>, L<Devel::Ladybug::Subtype>, and examples
-in this document.
+This imports the C<create> and C<subtype> class prototyping functions.
 
 =item * :bool
 
