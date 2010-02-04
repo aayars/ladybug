@@ -364,11 +364,11 @@ sub kickClassTires {
     } );
   };
 
-  my $ids;
+  my $i = 0;
 
-  ok( $ids = $class->allIds, "Look up all IDs" );
+  my $count = $class->count;
 
-  $ids->each(
+  $class->each(
     sub {
       my $id = shift;
 
@@ -390,8 +390,12 @@ sub kickClassTires {
 
         kickObjectTires($obj);
       }
+
+      $i++;
     }
   );
+
+  is( $i, $count);
 
   if ( $class->__useDbi ) {
     ok( $class->__dropTable(), "Drop table" );

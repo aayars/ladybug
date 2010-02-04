@@ -410,6 +410,8 @@ asserted as inline attributes.
 
 =item * L<Devel::Ladybug::Class::Dumper> - Introspection mix-in
 
+=item * L<Devel::Ladybug::Node> - Abstract stored object class
+
 =item * L<Devel::Ladybug::Object> - Abstract object class
 
 =item * L<Devel::Ladybug::Persistence> - Storage and retrieval mix-in
@@ -422,13 +424,13 @@ asserted as inline attributes.
 
 =item * L<Devel::Ladybug::Persistence::SQLite> - SQLite overrides
 
-=item * L<Devel::Ladybug::Node> - Abstract stored object class
-
-=item * L<Devel::Ladybug::Type> - Instance variable typing
+=item * L<Devel::Ladybug::Stream> - Buffered iterator for table rows
 
 =item * L<Devel::Ladybug::Scalar> - Base class for scalar values
 
 =item * L<Devel::Ladybug::Subtype> - Instance variable subtyping
+
+=item * L<Devel::Ladybug::Type> - Instance variable typing
 
 =back
 
