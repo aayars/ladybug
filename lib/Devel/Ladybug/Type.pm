@@ -243,10 +243,6 @@ Returns a CODE ref which tests the received value for CODE-ness.
 
 Returns a CODE ref which tests the received value for hash-ness.
 
-=item * isIO(IO $io)
-
-Returns a CODE ref which tests the received value for IO-ness.
-
 =item * isRef(Ref $ref)
 
 Returns a CODE ref which tests the received value for ref-ness.
@@ -386,16 +382,6 @@ use constant isHash => sub {
   }
 
   throw Devel::Ladybug::AssertFailed("Received value is not a Hash");
-};
-
-use constant isIO => sub {
-  my $io = shift;
-
-  if ( !defined($io) ) {
-    throw Devel::Ladybug::AssertFailed("IO ref must not be undef");
-  }
-
-  return true;
 };
 
 use constant isRef => sub {
