@@ -2980,7 +2980,7 @@ Generates a new ID for the current object. Default is GUID-style.
   _newId => sub {
     my $self = shift;
 
-    return Devel::Ladybug::Utility::newId();
+    return Devel::Ladybug::Utility::randstr();
   }
 
 =cut

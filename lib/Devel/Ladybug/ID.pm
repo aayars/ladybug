@@ -17,9 +17,9 @@ Devel::Ladybug::ID - Overloaded GUID object class
 
 =head1 DESCRIPTION
 
-Extends L<Devel::Ladybug::Scalar> and L<Data::GUID>
+Extends L<Devel::Ladybug::Scalar>.
 
-ID objects stringify as base64, which makes them as small as practical.
+ID objects stringify as base64.
 
 =head1 SYNOPSIS
 
@@ -64,13 +64,9 @@ use warnings;
 use Devel::Ladybug::Enum::Bool;
 
 use URI::Escape;
-
 use Data::GUID;
 
 use base qw| Devel::Ladybug::Scalar |;
-# use base qw| Data::GUID Devel::Ladybug::Scalar |;
-
-#  '""'     => sub { shift->as_base64() };
 
 sub new {
   my $class = shift;

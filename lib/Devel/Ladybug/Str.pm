@@ -17,8 +17,7 @@ Devel::Ladybug::Str - Overloaded object class for strings
 
 =head1 DESCRIPTION
 
-Extends L<Devel::Ladybug::Scalar>, L<Mime::Base64>, and
-L<Unicode::String>.
+Extends L<Devel::Ladybug::Scalar> for string operations.
 
 =head1 SYNOPSIS
 
