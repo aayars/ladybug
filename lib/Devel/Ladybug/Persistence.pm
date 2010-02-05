@@ -1,4 +1,4 @@
-#
+
 # File: lib/Devel/Ladybug/Persistence.pm
 #
 # Copyright (c) 2009 TiVo Inc.
@@ -64,7 +64,6 @@ use warnings;
 #
 use Cache::Memcached::Fast;
 use Clone qw| clone |;
-use Digest::SHA1 qw| sha1_hex |;
 use Error qw| :try |;
 use File::Copy;
 use File::Path;
@@ -1945,14 +1944,15 @@ sub __cacheKey {
 
     throw Devel::Ladybug::InvalidArgument(
       "BUG (Check $caller): $class->__cacheKey(\$id) received undef for \$id" );
+  } elsif (
+    $class->asserts->{ $class->__primaryKey }->isa("Devel::Ladybug::ID")
+  ) {
+    return $id;
+  } else {
+    my $key = join( ':', $class, $id );
+
+    return $key;
   }
-
-  my $qid = join( '/', $class, $id );
-
-  my $key = sha1_hex($qid);
-  chomp($key);
-
-  return $key;
 }
 
 sub __write {
