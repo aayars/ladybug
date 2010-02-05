@@ -175,16 +175,16 @@ Reconnects to database, if necessary.
     my $class = shift;
 
     my $query = sprintf(
-      q| SELECT * FROM %s |,
+      q| SELECT id FROM %s where foo like "%bar%" |,
       $class->tableName()
     );
 
     my $sth = $class->query($query);
 
-    while ( my $object = $sth->fetchrow_hashref() ) {
-      $class->__marshal($object);
+    while ( my ( $id ) = $sth->fetchrow_array() ) {
+      my $obj = $class->load($id);
 
-      # Stuff ...
+      # ...
     }
 
     $sth->finish();
