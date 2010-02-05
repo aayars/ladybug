@@ -629,34 +629,69 @@ sub tuples {
 
 =item * $class->memberClass($attribute)
 
-Only applicable for attributes which were asserted as
-L<Devel::Ladybug::ExtID()>.
+Only usable for foreign keys.
 
 Returns the class of object referenced by the named attribute.
-
-Example A:
 
   #
   # In a class prototype, there was an ExtID assertion:
   #
-  create "YourApp::Example" => {
-    userId => YourApp::Example::User->assert,
 
-    # Stuff ...
+  # ...
+  use YourApp::OtherClass;
+  use YourApp::AnotherClass;
+
+  create "YourApp::Example" => {
+    #
+    # OtherClass asserts ExtID by default:
+    #
+    userId => YourApp::OtherClass->assert,
+
+    #
+    # This is a one-to-many ExtID assertion:
+    #
+    categoryId => Devel::Ladybug::Array->assert(
+      YourApp::AnotherClass->assert
+    ),
+
+    # ...
   };
 
-  #
-  # Hypothetical object "Foo" has a "userId" attribute,
-  # which specifies an ID in a user table:
-  #
-  my $exa = YourApp::Example->spawn("Foo");
 
-  #
-  # Retrieve the external object by ID:
-  #
-  my $userClass = YourApp::Example->memberClass("userId");
+Meanwhile, in caller...
 
-  my $user = $userClass->load($exa->userId());
+  # ...
+  use YourApp::Example;
+
+  my $class = "YourApp::Example";
+
+  my $exa = $class->load("Foo");
+
+  do {
+    # Ask for the foreign class, eg "YourApp::OtherClass":
+    my $memberClass = $class->memberClass("userId");
+
+    # Use the persistence methods in the foreign class:
+    my $user = $memberClass->load($exa->userId());
+
+    $user->print;
+  };
+
+One-to-many example:
+
+  do {
+    # Ask for the foreign class, eg "YourApp::AnotherClass":
+    my $memberClass = $class->memberClass("categoryId");
+
+    # Use the persistence methods in the foreign class:
+    $exa->categoryId->each( sub {
+      my $memberId = shift;
+
+      my $category = $memberClass->load($memberId);
+
+      $category->print;
+    } );
+  };
 
 =cut
 
@@ -667,7 +702,7 @@ sub memberClass {
   throw Devel::Ladybug::AssertFailed("$key is not a member of $class")
     if !$class->isAttributeAllowed($key);
 
-  my $type = $class->asserts->{$key}->memberClass;
+  my $type = $class->asserts->{$key}->externalClass;
 }
 
 =pod
@@ -1100,7 +1135,11 @@ sub loadYaml {
   throw Devel::Ladybug::InvalidArgument("Empty YAML stream received")
     if !$yaml;
 
-  my $hash = YAML::Syck::Load($yaml);
+  my $hash;
+
+  eval {
+    $hash = YAML::Syck::Load($yaml) || die $@;
+  };
 
   throw Devel::Ladybug::DataConversionFailed($@) if $@;
 
@@ -2762,51 +2801,6 @@ sub key {
   my $class = $self->class();
 
   return $self->get( $class->__primaryKey() );
-}
-
-=pod
-
-=item * $self->memberInstances($key)
-
-Only applicable for attributes which were asserted as C<ExtID()>.
-
-Returns a Devel::Ladybug::Array of objects referenced by the named
-attribute.
-
-Equivalent to using C<load()> on the class returned by class method
-C<memberClass()>, for each ID in the relationship.
-
-  my $exa = YourApp::Example->spawn("Foo");
-
-  my $users = $exa->memberInstances("userId");
-
-=cut
-
-sub memberInstances {
-  my $self = shift;
-  my $key  = shift;
-
-  my $instances = Devel::Ladybug::Array->new();
-
-  my $memberClass = $self->class()->memberClass($key);
-
-  return $instances if !defined $memberClass;
-
-  my $extId = $self->get($key);
-
-  return $instances if !defined $extId;
-
-  my $type = $self->class()->asserts()->{$key};
-
-  if ( $type && ref($type) eq 'Devel::Ladybug::Type::Array' ) {
-    for ( @{ $self->{$key} } ) {
-      $instances->push( $memberClass->load($_) );
-    }
-  } else {
-    $instances->push( $memberClass->load($extId) );
-  }
-
-  return $instances;
 }
 
 =pod

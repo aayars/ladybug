@@ -461,6 +461,10 @@ sub testExtID {
         %{$prototype},
 
         parentId => $class->assert,
+
+        multiParentId => Devel::Ladybug::Array->assert(
+          $class->assert
+        )
       }
     ),
     "Allocate child class"
@@ -483,10 +487,25 @@ sub testExtID {
 
   my $child = $childClass->new(
     name     => "Child",
-    parentId => $parent->id
+    parentId => $parent->id,
+    multiParentId => [ $parent->id ],
   );
 
   ok( $child->save(), "Save child object" );
+
+  my $memberClass = $childClass->memberClass("parentId");
+  is($memberClass, $class);
+  isa_ok($memberClass->load( $child->parentId ), $class);
+
+  my $multiMemberClass = $childClass->memberClass("multiParentId");
+  is($multiMemberClass, $class);
+  ok($child->multiParentId->count > 0, "Multi-parent count > 0");
+  $child->multiParentId->each( sub {
+    my $thisParentId = shift;
+    isa_ok($memberClass->load( $thisParentId ), $class);
+  } );
+
+  is($childClass->memberClass("parentId"), $class);
 
   ok( $child->remove(),  "Remove child object" );
   ok( $parent->remove(), "Remove parent object" );
