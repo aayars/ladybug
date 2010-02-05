@@ -1018,100 +1018,6 @@ sub tableName {
 
 =pod
 
-=item * $class->elementClass($key);
-
-Returns the dynamic subclass used for an Array or Hash attribute.
-
-Instances of the element class represent rows in a linked table.
-
-  #
-  # File: Example.pm
-  #
-  create "YourApp::Example" => {
-    testArray => Devel::Ladybug::Array->assert( ... )
-
-  };
-
-  #
-  # File: testcaller.pl
-  #
-  my $elementClass = YourApp::Example->elementClass("testArray");
-
-  print "$elementClass\n"; # YourApp::Example::testArray
-
-In the above example, YourApp::Example::testArray is the name of the
-dynamic subclass which was allocated as a container for
-YourApp::Example's array elements.
-
-=cut
-
-sub elementClass {
-  my $class = shift;
-  my $key   = shift;
-
-  return if !$class->__useDbi;
-
-  my $elementClasses = $class->get("__elementClasses");
-
-  if ( !$elementClasses ) {
-    $elementClasses = Devel::Ladybug::Hash->new();
-
-    $class->set( "__elementClasses", $elementClasses );
-  }
-
-  if ( $elementClasses->{$key} ) {
-    return $elementClasses->{$key};
-  }
-
-  my $asserts = $class->asserts();
-
-  my $type = $asserts->{$key};
-
-  my $elementClass;
-
-  if ($type) {
-    my $base = $class->__baseAsserts();
-    delete $base->{name};
-
-    if ( $type->objectClass()->isa('Devel::Ladybug::Array') ) {
-      $elementClass = join( "::", $class, $key );
-
-      create $elementClass => {
-        __dbiType => $class->__dbiType,
-
-        name => Devel::Ladybug::Name->assert(
-          Devel::Ladybug::Type::subtype( optional => true )
-        ),
-        parentId     => $class->assert,
-        elementIndex => Devel::Ladybug::Int->assert,
-        elementValue => $type->memberType,
-      };
-
-    } elsif ( $type->objectClass()->isa('Devel::Ladybug::Hash') ) {
-      $elementClass = join( "::", $class, $key );
-
-      my $memberClass = $class->memberClass($key);
-
-      create $elementClass => {
-        __dbiType => $class->__dbiType,
-
-        name => Devel::Ladybug::Name->assert(
-          Devel::Ladybug::Type::subtype( optional => true )
-        ),
-        parentId     => $class->assert,
-        elementKey   => Devel::Ladybug::Str->assert,
-        elementValue => Devel::Ladybug::Str->assert,
-      };
-    }
-  }
-
-  $elementClasses->{$key} = $elementClass;
-
-  return $elementClass;
-}
-
-=pod
-
 =item * $class->loadYaml($string)
 
 Load the received string containing YAML into an instance of the
@@ -1878,7 +1784,7 @@ sub __marshal {
 
       if ($type) {
         if ( $type->objectClass()->isa('Devel::Ladybug::Array') ) {
-          my $elementClass = $class->elementClass($key);
+          my $elementClass = $class->__elementClass($key);
 
           my $array = $type->objectClass()->new();
 
@@ -1915,7 +1821,7 @@ sub __marshal {
           $self->{$key} = $array;
 
         } elsif ( $type->objectClass()->isa('Devel::Ladybug::Hash') ) {
-          my $elementClass = $class->elementClass($key);
+          my $elementClass = $class->__elementClass($key);
 
           my $hash = $type->objectClass()->new();
 
@@ -2455,7 +2361,7 @@ sub __init {
       if ( $assert->isa("Devel::Ladybug::Type::Array")
         || $assert->isa("Devel::Ladybug::Type::Hash") )
       {
-        $class->elementClass($key);
+        $class->__elementClass($key);
       }
     }
   );
@@ -2570,6 +2476,100 @@ sub __dbPort {
 
 =pod
 
+=item * $class->__elementClass($key);
+
+Returns the dynamic subclass used for an Array or Hash attribute.
+
+Instances of the element class represent rows in a linked table.
+
+  #
+  # File: Example.pm
+  #
+  create "YourApp::Example" => {
+    testArray => Devel::Ladybug::Array->assert( ... )
+
+  };
+
+  #
+  # File: testcaller.pl
+  #
+  my $elementClass = YourApp::Example->__elementClass("testArray");
+
+  print "$elementClass\n"; # YourApp::Example::testArray
+
+In the above example, YourApp::Example::testArray is the name of the
+dynamic subclass which was allocated as a container for
+YourApp::Example's array elements.
+
+=cut
+
+sub __elementClass {
+  my $class = shift;
+  my $key   = shift;
+
+  return if !$class->__useDbi;
+
+  my $elementClasses = $class->get("__elementClasses");
+
+  if ( !$elementClasses ) {
+    $elementClasses = Devel::Ladybug::Hash->new();
+
+    $class->set( "__elementClasses", $elementClasses );
+  }
+
+  if ( $elementClasses->{$key} ) {
+    return $elementClasses->{$key};
+  }
+
+  my $asserts = $class->asserts();
+
+  my $type = $asserts->{$key};
+
+  my $elementClass;
+
+  if ($type) {
+    my $base = $class->__baseAsserts();
+    delete $base->{name};
+
+    if ( $type->objectClass()->isa('Devel::Ladybug::Array') ) {
+      $elementClass = join( "::", $class, $key );
+
+      create $elementClass => {
+        __dbiType => $class->__dbiType,
+
+        name => Devel::Ladybug::Name->assert(
+          Devel::Ladybug::Type::subtype( optional => true )
+        ),
+        parentId     => $class->assert,
+        elementIndex => Devel::Ladybug::Int->assert,
+        elementValue => $type->memberType,
+      };
+
+    } elsif ( $type->objectClass()->isa('Devel::Ladybug::Hash') ) {
+      $elementClass = join( "::", $class, $key );
+
+      my $memberClass = $class->memberClass($key);
+
+      create $elementClass => {
+        __dbiType => $class->__dbiType,
+
+        name => Devel::Ladybug::Name->assert(
+          Devel::Ladybug::Type::subtype( optional => true )
+        ),
+        parentId     => $class->assert,
+        elementKey   => Devel::Ladybug::Str->assert,
+        elementValue => Devel::Ladybug::Str->assert,
+      };
+    }
+  }
+
+  $elementClasses->{$key} = $elementClass;
+
+  return $elementClass;
+}
+
+=pod
+
 =back
 
 =head1 PUBLIC INSTANCE METHODS
@@ -2665,7 +2665,7 @@ sub remove {
         if !$type->objectClass->isa("Devel::Ladybug::Array")
           && !$type->objectClass->isa("Devel::Ladybug::Hash");
 
-      my $elementClass = $class->elementClass($key);
+      my $elementClass = $class->__elementClass($key);
 
       next if !$elementClass;
 
@@ -3154,7 +3154,7 @@ sub _localSaveInsideTransaction {
           if !$type->objectClass->isa("Devel::Ladybug::Array")
             && !$type->objectClass->isa("Devel::Ladybug::Hash");
 
-        my $elementClass = $class->elementClass($key);
+        my $elementClass = $class->__elementClass($key);
 
         $elementClass->write(
           sprintf 'DELETE FROM %s WHERE %s = %s',

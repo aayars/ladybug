@@ -368,7 +368,7 @@ sub __dropTable {
     sub {
       my $key = shift;
 
-      my $elementClass = $class->elementClass($key);
+      my $elementClass = $class->__elementClass($key);
 
       return if !$elementClass;
 
@@ -400,7 +400,7 @@ sub __createTable {
     sub {
       my $key = shift;
 
-      my $elementClass = $class->elementClass($key);
+      my $elementClass = $class->__elementClass($key);
 
       return if !$elementClass;
 

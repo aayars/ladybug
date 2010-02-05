@@ -450,16 +450,6 @@ sub assert {
     "You may not assert attributes for abstract class $class");
 }
 
-sub elementClass {
-  my $class = shift;
-  my $key   = shift;
-
-  #
-  # Fine for abstract method
-  #
-  return undef;
-}
-
 =pod
 
 =back
@@ -509,7 +499,7 @@ sub import {
 
     # ref($type->{$key}) !~ /Hash|Array/i;
 
-    $class->elementClass($key);
+    $class->__elementClass($key);
   }
 }
 
@@ -611,6 +601,16 @@ sub __assertClass {
   }
 
   return $assertClass;
+}
+
+sub __elementClass {
+  my $class = shift;
+  my $key   = shift;
+
+  #
+  # Fine for abstract method
+  #
+  return undef;
 }
 
 =pod
