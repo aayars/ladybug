@@ -97,6 +97,9 @@ examples.
 
 =head1 DESCRIPTION
 
+Devel::Ladybug is a framework for creating and working with data
+models.
+
 Using the C<create()> function, developers may assert rules for
 classes. Devel::Ladybug creates a permanent backing store for these
 classes, and can also handle object-relational mapping and input
