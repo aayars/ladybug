@@ -199,10 +199,10 @@ sub __statementForColumn {
   my $datatype = $type->columnType || 'TEXT';
 
   if ( $datatype =~ /^INT/ ) {
-    warn "$datatype will be INT in Postgres";
+    warnOnce($datatype,"$datatype will be INT in Postgres");
     $datatype = "INT";
   } elsif ( $datatype =~ /^DOUBLE/ ) {
-    warn "$datatype will be FLOAT in Postgres";
+    warnOnce($datatype,"$datatype will be FLOAT in Postgres");
     $datatype = "FLOAT";
   }
 
@@ -365,6 +365,19 @@ sub __elementIndexKey {
   my $class = shift;
 
   return "\"elementIndex\"";
+}
+
+my $warned = { };
+
+sub warnOnce {
+  my $key = shift;
+  my $warning = shift;
+
+  return if exists $warned->{$key};
+
+  warn $warning;
+
+  $warned->{$key}++;
 }
 
 1;
