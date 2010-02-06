@@ -270,7 +270,7 @@ Meanwhile...
   # See DBIx::TextIndex
   #
   my $ids = $class->search({
-    field1 => '"a phrase" +and −not or',
+    field1 => '+andword -notword orword "phrase words"',
     field2 => 'more words',
   });
 
