@@ -87,7 +87,8 @@ operations
 
 =head2 indexed => $bool
 
-Enable full-text indexing for this column.
+Enable full-text indexing for this column. This is an experimental
+feature.
 
 =head2 min => $num
 

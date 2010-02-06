@@ -105,9 +105,9 @@ classes. Devel::Ladybug creates a permanent backing store for these
 classes, and can also handle object-relational mapping and input
 validation.
 
-YAML flatfile, MySQL/InnoDB, PostgreSQL, and SQLite are supported.
-Memcached, DBIx::TextIndex, and RCS may be used in conjunction with
-the permanent backing store.
+Supported storage types are YAML or JSON flatfile, MySQL (InnoDB
+engine), PostgreSQL, and SQLite. Memcached, DBIx::TextIndex, and
+RCS may be used in conjunction with the permanent backing store.
 
 =head1 VERSION
 

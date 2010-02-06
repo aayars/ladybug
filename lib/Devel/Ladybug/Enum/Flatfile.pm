@@ -10,7 +10,7 @@
 #
 package Devel::Ladybug::Enum::Flatfile;
 
-use Devel::Ladybug::Enum qw| None YAML JSON |;
+use Devel::Ladybug::Enum qw| None YAML JSON XML |;
 
 =head1 NAME
 
