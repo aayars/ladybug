@@ -5,7 +5,9 @@
     directly in the case of self-referential tables.
   - Documented new features
   - List collectors revisited
+  - JSON may be used as a flatfile type, see Persistence docs
   - Some methods are going away. These will warn for now:
+    - $class->__useYaml depracated. Use $class->__useFlatfile instead.
     - $array->collect depracated. Use $array->each instead.
     - $array->collectWithIndex depracated. Use $array->each instead.
     - $array->eachWithIndex depracated. Use $array->each instead.

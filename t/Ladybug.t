@@ -91,30 +91,49 @@ SKIP: {
 #####
 
 SKIP: {
-  skip( $nofs, 3 ) if $nofs;
+  skip( $nofs, 4 ) if $nofs;
 
-  my $class = "Ladybug_YAMLTest::YAMLTest01";
-  ok(
-    testCreate(
-      $class => {
-        __useDbi       => false,
-        __useYaml      => true,
-        __useMemcached => 5,
-        __useRcs       => true,
-        %classPrototype
-      }
-    ),
-    "Class allocate w/ YAML"
-  );
+  do {
+    my $class = "Ladybug::YAMLTest";
+    ok(
+      testCreate(
+        $class => {
+          __useDbi       => false,
+          __useFlatfile  => true,
+          __useMemcached => 5,
+          __useRcs       => true,
+          %classPrototype
+        }
+      ),
+      "Class allocate w/ YAML"
+    );
 
-  kickClassTires($class);
+    kickClassTires($class);
+  };
+
+  do {
+    my $class = "Ladybug::JSONTest";
+    ok(
+      testCreate(
+        $class => {
+          __useDbi       => false,
+          __useFlatfile  => 2, # JSON Backend
+          __useMemcached => 5,
+          %classPrototype
+        }
+      ),
+      "Class allocate w/ JSON"
+    );
+
+    kickClassTires($class);
+  };
 
   ok(
     testExtID(
-      "Ladybug_YAMLTest::ExtIDTest",
+      "Ladybug::ExtIDTest",
       {
         __useDbi  => false,
-        __useYaml => true,
+        __useFlatfile => true,
       }
     ),
     "ExtID support for YAML"
@@ -134,7 +153,7 @@ SKIP: {
     skip( $reason, 5 );
   }
 
-  my $class = "Ladybug_SQLiteTest::SQLiteTest01";
+  my $class = "Ladybug::SQLiteTest01";
   ok(
     testCreate(
       $class => {
@@ -142,7 +161,7 @@ SKIP: {
         __dbiType      => 1,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         %classPrototype
       }
     ),
@@ -151,7 +170,7 @@ SKIP: {
 
   kickClassTires($class);
 
-  $class = "Ladybug_SQLiteTest::SQLiteTest02";
+  $class = "Ladybug::SQLiteTest02";
   ok(
     testCreate(
       $class => {
@@ -159,7 +178,7 @@ SKIP: {
         __dbiType      => 1,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         id             => Devel::Ladybug::Serial->assert,
         %classPrototype
       }
@@ -171,7 +190,7 @@ SKIP: {
 
   ok(
     testExtID(
-      "Ladybug_SQLiteTest::ExtIDTest",
+      "Ladybug::ExtIDTest",
       {
         __useDbi  => true,
         __dbiType => 1
@@ -202,7 +221,7 @@ SKIP: {
         __dbiType      => 0,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         %classPrototype
       }
     ),
@@ -219,7 +238,7 @@ SKIP: {
         __dbiType      => 0,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         id             => Devel::Ladybug::Serial->assert,
         %classPrototype
       }
@@ -262,7 +281,7 @@ SKIP: {
         __dbiType      => 2,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         %classPrototype
       }
     ),
@@ -279,7 +298,7 @@ SKIP: {
         __dbiType      => 2,
         __useMemcached => 5,
         __useRcs       => true,
-        __useYaml      => true,
+        __useFlatfile  => true,
         id             => Devel::Ladybug::Serial->assert,
         %classPrototype
       }

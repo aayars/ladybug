@@ -14,6 +14,7 @@ lib/Devel/Ladybug/DateTime.pm
 lib/Devel/Ladybug/Double.pm
 lib/Devel/Ladybug/Enum/Bool.pm
 lib/Devel/Ladybug/Enum/DBIType.pm
+lib/Devel/Ladybug/Enum/Flatfile.pm
 lib/Devel/Ladybug/Enum.pm
 lib/Devel/Ladybug/Exceptions.pm
 lib/Devel/Ladybug/ExtID.pm

@@ -63,6 +63,7 @@ use warnings;
 # Third-party packages
 #
 use Cache::Memcached::Fast;
+use Carp::Heavy;
 use Clone qw| clone |;
 use Error qw| :try |;
 use File::Copy;
@@ -86,6 +87,7 @@ use Devel::Ladybug::Constants qw|
   rcsBindir rcsDir
   |;
 use Devel::Ladybug::Enum::DBIType;
+use Devel::Ladybug::Enum::Flatfile;
 use Devel::Ladybug::Exceptions;
 use Devel::Ladybug::Stream;
 use Devel::Ladybug::Utility;
@@ -498,7 +500,7 @@ Returns a L<Devel::Ladybug::Array> of all IDs in the receiving class.
 sub allIds {
   my $class = shift;
 
-  if ( $class->__useYaml() && !$class->__useDbi() ) {
+  if ( $class->__useFlatfile() && !$class->__useDbi() ) {
     return $class->__fsIds();
   }
 
@@ -526,7 +528,7 @@ Returns the number of rows in this class's backing store.
 sub count {
   my $class = shift;
 
-  if ( $class->__useYaml && !$class->__useDbi ) {
+  if ( $class->__useFlatfile && !$class->__useDbi ) {
     return $class->allIds->count;
   }
 
@@ -584,7 +586,7 @@ sub each {
   #
   return Devel::Ladybug::Hash::each($class, $sub) if $class->class;
 
-  if ( $class->__useYaml && !$class->__useDbi ) {
+  if ( $class->__useFlatfile && !$class->__useDbi ) {
     return $class->allIds->each($sub);
   }
 
@@ -615,7 +617,7 @@ Returns a L<Devel::Ladybug::Array> of all IDs and Names in this table.
 sub tuples {
   my $class = shift;
 
-  if ( $class->__useYaml && !$class->__useDbi ) {
+  if ( $class->__useFlatfile && !$class->__useDbi ) {
     Devel::Ladybug::MethodIsAbstract->throw(
       "tuples method not yet implemented for YAML backing stores"
     );
@@ -1125,59 +1127,71 @@ illustrate.
 
 =over 4
 
-=item * $class->__useYaml()
+=item * $class->__useFlatfile()
 
-Return a true value to maintain a YAML backend for all saved objects.
+Return a true value or constant value from
+L<Devel::Ladybug::Enum::Flatfile>, to maintain a flatfile backend for
+all saved objects.
 
 Default inherited value is auto-detected for the local system. Set
 class variable to override.
 
-YAML and DBI backing stores are not mutually exclusive. Classes may use
-either, both, or neither, depending on use case.
-
-Generally, one would use YAML if they are not also using DBI, and just
-wish to use a flatfile YAML backing store for all objects of a class:
+Flatfile and DBI backing stores are not mutually exclusive. Classes
+may use either, both, or neither, depending on use case.
 
   #
   # Flatfile backing store only-- no DBI:
   #
   create "YourApp::Example::NoDbi" => {
-    __useYaml => true,
+    __useFlatfile => true,
     __useDbi  => false,
   };
-
-The main reason to use both YAML and DBI would be to maintain RCS
-version archives for objects. When using YAML and DBI, Devel::Ladybug
-writes out a YAML file upon save, but uses the database for everything
-but version restores:
 
   #
   # Maintain version history, but otherwise use DBI for everything:
   #
   create "YourApp::Example::DbiPlusRcs" => {
-    __useYaml => true,
+    __useFlatfile => true,
     __useRcs  => true,
     __useDbi  => true,
   };
 
-Use C<__yamlHost> to enforce a master host for YAML/RCS archives.
+To use JSON format, use the constant value from
+L<Devel::Ladybug::Enum::Flatfile>.
+
+  #
+  # Javascript could handle these objects as input:
+  #
+  create "YourApp::Example::JSON" => {
+    __useFlatfile => Devel::Ladybug::Enum::Flatfile::JSON
+  };
+
+Use C<__yamlHost> to enforce a master flatfile host.
 
 =cut
 
 sub __useYaml {
   my $class = shift;
 
-  my $useYaml = $class->get("__useYaml");
+  warn "__useYaml is depracated, please use __useFlatfile";
 
-  if ( !defined $useYaml ) {
+  return $class->__useFlatfile;
+}
+
+sub __useFlatfile {
+  my $class = shift;
+
+  my $useFlatfile = $class->get("__useFlatfile");
+
+  if ( !defined $useFlatfile ) {
     my %args = $class->__autoArgs();
 
-    $useYaml = $args{"__useYaml"};
+    $useFlatfile = $args{"__useFlatfile"};
 
-    $class->set( "__useYaml", $useYaml );
+    $class->set( "__useFlatfile", $useFlatfile );
   }
 
-  return $useYaml;
+  return $useFlatfile;
 }
 
 =pod
@@ -1193,7 +1207,7 @@ __useRcs does nothing for classes which do not also use YAML. The RCS
 archive is derived from the physical files in the YAML backing store.
 
   create "YourApp::Example" => {
-    __useYaml => true,
+    __useFlatfile => true, # Must be YAML
     __useRcs => true
 
   };
@@ -1209,9 +1223,13 @@ sub __useRcs {
 
   my $use = $class->get("__useRcs");
 
-  if ( $use && !$class->__useYaml ) {
+  my $backend = $class->__useFlatfile;
+
+  if ( $use &&
+    ( !$backend || $backend != Devel::Ladybug::Enum::Flatfile::YAML )
+  ) {
     Devel::Ladybug::RuntimeError->throw(
-      "Using RCS without also using YAML has no effect");
+      "RCS requires a flatfile type of YAML");
   }
 
   return $use;
@@ -1233,9 +1251,9 @@ Defaults to the C<yamlHost> L<Devel::Ladybug::Constants> value (ships
 as C<undef>), but may be overridden on a per-class basis.
 
   create "YourApp::Example" => {
-    __useYaml  => true,
-    __useRcs   => true,
-    __yamlHost => "host023.example.com".
+    __useFlatfile  => true,
+    __useRcs       => true,
+    __yamlHost     => "host023.example.com".
 
   };
 
@@ -1381,23 +1399,23 @@ sub __autoArgs {
   return %createArgs if %createArgs;
 
   $createArgs{__useDbi}  = false;
-  $createArgs{__useYaml} = true;
+  $createArgs{__useFlatfile} = true;
   $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::SQLite;
 
   if ( $class->__supportsSQLite() ) {
     $createArgs{__useDbi}  = true;
-    $createArgs{__useYaml} = false;
+    $createArgs{__useFlatfile} = false;
   }
 
   if ( $class->__supportsPostgreSQL() ) {
     $createArgs{__useDbi}  = true;
-    $createArgs{__useYaml} = false;
+    $createArgs{__useFlatfile} = false;
     $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::PostgreSQL;
   }
 
   if ( $class->__supportsMySQL() ) {
     $createArgs{__useDbi}  = true;
-    $createArgs{__useYaml} = false;
+    $createArgs{__useFlatfile} = false;
     $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::MySQL;
   }
 
@@ -1644,7 +1662,7 @@ sub __localLoad {
 
   if ( $class->__useDbi() ) {
     return $class->__loadFromDatabase($id);
-  } elsif ( $class->__useYaml() ) {
+  } elsif ( $class->__useFlatfile() ) {
     return $class->__loadYamlFromId($id);
   } else {
     throw Devel::Ladybug::MethodIsAbstract(
@@ -2175,7 +2193,13 @@ sub __loadYamlFromPath {
   if ( -e $path ) {
     my $yaml = $class->__getSourceByPath($path);
 
-    return $class->loadYaml($yaml);
+    my $backend = $class->__useFlatfile;
+
+    if ( $backend == Devel::Ladybug::Enum::Flatfile::JSON ) {
+      return $class->loadJson($yaml);
+    } else {
+      return $class->loadYaml($yaml);
+    }
   } else {
     throw Devel::Ladybug::FileAccessError("Path $path does not exist on disk");
   }
@@ -2267,7 +2291,7 @@ sub __checkYamlHost {
   #
   # See if we are on the correct host before proceeding...
   #
-  if ( $class->__useYaml() ) {
+  if ( $class->__useFlatfile() ) {
     my $yamlHost = $class->__yamlHost();
 
     if ($yamlHost) {
@@ -2698,7 +2722,7 @@ sub remove {
     $self->_removeFromTextIndex($index);
   }
 
-  if ( $class->__useYaml() ) {
+  if ( $class->__useFlatfile() ) {
     $self->_fsDelete();
   }
 
@@ -3207,7 +3231,7 @@ sub _localSaveInsideTransaction {
   #
   # Update the YAML backing store if using YAML
   #
-  if ( $class->__useYaml() ) {
+  if ( $class->__useFlatfile() ) {
     my $path = $self->_path();
 
     my $useRcs = $class->__useRcs();
@@ -3506,7 +3530,15 @@ sub _saveToPath {
     }
   }
 
-  my $yaml = $self->toYaml();
+  my $backend = $class->__useFlatfile;
+
+  my $yaml;
+
+  if ( $backend == Devel::Ladybug::Enum::Flatfile::JSON ) {
+    $yaml = $self->toJson();
+  } else {
+    $yaml = $self->toYaml();
+  }
 
   open( TEMP, "> $tempPath" );
   print TEMP $yaml;

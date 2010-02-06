@@ -551,10 +551,9 @@ prototype is the literal value to be used for the class variable.
 
   create "YourApp::Example" => {
     #
-    # Override a few class variables
+    # Override a class variable
     #
-    __useYaml => false,
-    __dbiType => Devel::Ladybug::DBIType::MySQL
+    __useRcs => true
   };
 
 Devel::Ladybug class variables are just Perl package variables, scoped
