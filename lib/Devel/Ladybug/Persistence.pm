@@ -2051,7 +2051,9 @@ sub __dbhKey {
 sub __dbh {
   my $class = shift;
 
-  if ( !$class->__useDbi ) {
+  my $useDbi = $class->__useDbi;
+
+  if ( !$useDbi ) {
     Devel::Ladybug::RuntimeError->throw(
       "BUG: $class was asked for its DBH, but it does not use DBI.");
   }
@@ -2063,9 +2065,7 @@ sub __dbh {
   $dbi->{$dbKey} ||= Devel::Ladybug::Hash->new();
 
   if ( !$dbi->{$dbKey}->{$$} ) {
-    my $dbiType = $class->__useDbi;
-
-    if ( $dbiType == Devel::Ladybug::Enum::DBIType::MySQL ) {
+    if ( $useDbi == Devel::Ladybug::Enum::DBIType::MySQL ) {
       my %creds = (
         database => $dbName,
         host     => dbHost,
@@ -2076,12 +2076,12 @@ sub __dbh {
 
       $dbi->{$dbKey}->{$$} =
         Devel::Ladybug::Persistence::MySQL::connect(%creds);
-    } elsif ( $dbiType == Devel::Ladybug::Enum::DBIType::SQLite ) {
+    } elsif ( $useDbi == Devel::Ladybug::Enum::DBIType::SQLite ) {
       my %creds = ( database => join( '/', sqliteRoot, $dbName ) );
 
       $dbi->{$dbKey}->{$$} =
         Devel::Ladybug::Persistence::SQLite::connect(%creds);
-    } elsif ( $dbiType == Devel::Ladybug::Enum::DBIType::PostgreSQL ) {
+    } elsif ( $useDbi == Devel::Ladybug::Enum::DBIType::PostgreSQL ) {
       my %creds = (
         database => $dbName,
         host     => dbHost,
@@ -2094,7 +2094,7 @@ sub __dbh {
         Devel::Ladybug::Persistence::PostgreSQL::connect(%creds);
     } else {
       throw Devel::Ladybug::InvalidArgument(
-        sprintf( 'Unknown DBI Type %s returned by class %s', $dbiType, $class )
+        sprintf( 'Unknown DBI Type %s returned by class %s', $useDbi, $class )
       );
     }
   }
