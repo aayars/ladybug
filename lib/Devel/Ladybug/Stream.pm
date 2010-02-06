@@ -94,10 +94,36 @@ the received class.
 
 =over 4
 
+=item * $self->limit
+
+Returns the current limit value.
+
 =item * $self->setLimit($int)
 
 Sets the maximum number of rows to query before asking the database
 for the next chunk. Default is 50.
+
+=item * $self->offset
+
+Returns the current offset value.
+
+=item * $self->setOffset($int)
+
+Sets the starting row number. Default is 0.
+
+This value grows by the C<limit> value each time a chunk is loaded.
+
+=item * $self->queryClass
+
+Returns the current query class
+
+=item * $self->setQueryClass($newClass)
+
+Sets the query class to the received value
+
+=item * $self->query
+
+Returns the current query fragment.
 
 =item * $self->setQuery($newQuery)
 
