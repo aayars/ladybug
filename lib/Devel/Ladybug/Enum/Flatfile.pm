@@ -19,15 +19,13 @@ Devel::Ladybug::Enum::Flatfile - Database type enumeration
 =head1 DESCRIPTION
 
 Uses L<Devel::Ladybug::Enum> to provide constants which are used to
-specify database types. The mix-in L<Devel::Ladybug::Persistence> class
-method C<__dbiType()> should be overridden in a subclass to return one
-of the constants in this package.
+specify database types. The class variable C<__useFlatfile> should
+return one of the constants in this package.
 
 =head1 SYNOPSIS
 
   create "YourApp::YourClass" => {
-    __useDbi  => true,
-    __dbiType => Devel::Ladybug::Enum::Flatfile::<Type>,
+    __useFlatfile => Devel::Ladybug::Enum::Flatfile::<Type>,
 
   };
 

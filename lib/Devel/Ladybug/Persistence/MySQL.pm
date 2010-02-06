@@ -140,8 +140,6 @@ sub __schema {
       if $statement;
   }
 
-  my $dbiType = $class->__dbiType();
-
   if ( $unique->isEmpty() ) {
     $schema->push( sprintf( '  PRIMARY KEY(%s)', $primaryKey ) );
   } else {

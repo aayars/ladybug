@@ -804,11 +804,11 @@ sub AUTOLOAD {
     if ( $receiver->can("__useDbi") && $receiver->__useDbi ) {
       my $delegate;
 
-      if ( $receiver->__dbiType == 0 ) {
+      if ( $receiver->__useDbi == 1 ) {
         $delegate = "Devel::Ladybug::Persistence::MySQL";
-      } elsif ( $receiver->__dbiType == 1 ) {
+      } elsif ( $receiver->__useDbi == 2 ) {
         $delegate = "Devel::Ladybug::Persistence::SQLite";
-      } elsif ( $receiver->__dbiType == 2 ) {
+      } elsif ( $receiver->__useDbi == 3 ) {
         $delegate = "Devel::Ladybug::Persistence::PostgreSQL";
       }
 

@@ -50,9 +50,8 @@ Database and table names are automatically derived, but may be
 overridden on a per-class basis (See C<databaseName> or C<tableName>,
 in this document).
 
-See C<__use[Feature]> and C<__dbiType>, in this document, for
-directions on how to disable or augment specific backing store
-options when subclassing.
+See C<__use[Feature]>, in this document, for directions on how to
+disable or augment specific backing store options when subclassing.
 
 =cut
 
@@ -1275,42 +1274,6 @@ sub __yamlHost {
 
 =pod
 
-=item * $class->__useDbi()
-
-Returns a true value if the current class uses a SQL backing store,
-otherwise false.
-
-If __useDbi() returns true, the database type specified by __dbiType()
-will be used.  See __dbiType() for how to override the class's database
-type.
-
-Default inherited value is auto-detected for the local system. Set
-class variable to override.
-
-  create "YourApp::Example" => {
-    __useDbi => false
-  };
-
-=cut
-
-sub __useDbi {
-  my $class = shift;
-
-  my $useDbi = $class->get("__useDbi");
-
-  if ( !defined($useDbi) ) {
-    my %args = $class->__autoArgs();
-
-    $useDbi = $args{__useDbi};
-
-    $class->set( "__useDbi", $useDbi );
-  }
-
-  return $useDbi;
-}
-
-=pod
-
 =item * $class->__useMemcached()
 
 Returns a TTL in seconds, if the current class should attempt to use
@@ -1354,23 +1317,16 @@ sub __useMemcached {
 
 =pod
 
-=item * $class->__dbiType()
-
-This method is unused if C<__useDbi> returns false.
-
-Returns the constant of the DBI adapter to be used. Applies only if
-$class->__useDbi() returns a true value. Override in subclass to
-specify the desired backing store.
+=item * $class->__useDbi
 
 Returns a constant from the L<Devel::Ladybug::Enum::DBIType>
-enumeration. See L<Devel::Ladybug::Enum::DBIType> for a list of
-supported constants.
+enumeration, which represents the DBI type to be used.
 
 Default inherited value is auto-detected for the local system. Set
 class variable to override.
 
   create "YourApp::Example" => {
-    __dbiType => Devel::Ladybug::Enum::DBIType::SQLite
+    __useDbi => Devel::Ladybug::Enum::DBIType::SQLite
   };
 
 =cut
@@ -1378,14 +1334,22 @@ class variable to override.
 sub __dbiType {
   my $class = shift;
 
-  my $type = $class->get("__dbiType");
+  warn "__dbiType is depracated, use __useDbi instead";
+
+  return $class->useDbi;
+}
+
+sub __useDbi {
+  my $class = shift;
+
+  my $type = $class->get("__useDbi");
 
   if ( !defined($type) ) {
     my %args = $class->__autoArgs();
 
-    $type = $args{__dbiType};
+    $type = $args{__useDbi};
 
-    $class->set( "__dbiType", $type );
+    $class->set( "__useDbi", $type );
   }
 
   return $type;
@@ -1400,23 +1364,20 @@ sub __autoArgs {
 
   $createArgs{__useDbi}  = false;
   $createArgs{__useFlatfile} = true;
-  $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::SQLite;
 
   if ( $class->__supportsSQLite() ) {
-    $createArgs{__useDbi}  = true;
     $createArgs{__useFlatfile} = false;
+    $createArgs{__useDbi} = Devel::Ladybug::Enum::DBIType::SQLite;
   }
 
   if ( $class->__supportsPostgreSQL() ) {
-    $createArgs{__useDbi}  = true;
     $createArgs{__useFlatfile} = false;
-    $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::PostgreSQL;
+    $createArgs{__useDbi} = Devel::Ladybug::Enum::DBIType::PostgreSQL;
   }
 
   if ( $class->__supportsMySQL() ) {
-    $createArgs{__useDbi}  = true;
     $createArgs{__useFlatfile} = false;
-    $createArgs{__dbiType} = Devel::Ladybug::Enum::DBIType::MySQL;
+    $createArgs{__useDbi} = Devel::Ladybug::Enum::DBIType::MySQL;
   }
 
   return %createArgs;
@@ -2084,7 +2045,7 @@ active.
 sub __dbhKey {
   my $class = shift;
 
-  return join( "_", $class->databaseName, $class->__dbiType );
+  return join( "_", $class->databaseName, $class->__useDbi );
 }
 
 sub __dbh {
@@ -2102,7 +2063,7 @@ sub __dbh {
   $dbi->{$dbKey} ||= Devel::Ladybug::Hash->new();
 
   if ( !$dbi->{$dbKey}->{$$} ) {
-    my $dbiType = $class->__dbiType();
+    my $dbiType = $class->__useDbi;
 
     if ( $dbiType == Devel::Ladybug::Enum::DBIType::MySQL ) {
       my %creds = (
@@ -2434,7 +2395,6 @@ be used.
   # Set as class variables in the prototype:
   #
   create "YourApp::YourClass" => {
-    __dbiType => Devel::Ladybug::Enum::DBIType::MySQL,
     __dbUser => "user",
     __dbPass => "pass",
     __dbHost => "example.com",
@@ -2559,7 +2519,7 @@ sub __elementClass {
       $elementClass = join( "::", $class, $key );
 
       create $elementClass => {
-        __dbiType => $class->__dbiType,
+        __useDbi => $class->__useDbi,
 
         name => Devel::Ladybug::Name->assert(
           Devel::Ladybug::Type::subtype( optional => true )
@@ -2575,7 +2535,7 @@ sub __elementClass {
       my $memberClass = $class->memberClass($key);
 
       create $elementClass => {
-        __dbiType => $class->__dbiType,
+        __useDbi => $class->__useDbi,
 
         name => Devel::Ladybug::Name->assert(
           Devel::Ladybug::Type::subtype( optional => true )

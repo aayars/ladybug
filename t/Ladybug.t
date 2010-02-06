@@ -157,8 +157,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 1,
+        __useDbi       => 2,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -174,8 +173,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 1,
+        __useDbi       => 2,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -192,8 +190,7 @@ SKIP: {
     testExtID(
       "Ladybug::ExtIDTest",
       {
-        __useDbi  => true,
-        __dbiType => 1
+        __useDbi => 2
       }
     ),
     "ExtID support for SQLite"
@@ -217,8 +214,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 0,
+        __useDbi       => 1,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -234,8 +230,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 0,
+        __useDbi       => 1,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -252,8 +247,7 @@ SKIP: {
     testExtID(
       "Devel::Ladybug::MySQL::ExtIDTest",
       {
-        __useDbi  => true,
-        __dbiType => 0
+        __useDbi => 1
       }
     ),
     "ExtID support for MySQL"
@@ -277,8 +271,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 2,
+        __useDbi       => 3,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -294,8 +287,7 @@ SKIP: {
   ok(
     testCreate(
       $class => {
-        __useDbi       => true,
-        __dbiType      => 2,
+        __useDbi       => 3,
         __useMemcached => 5,
         __useRcs       => true,
         __useFlatfile  => true,
@@ -312,8 +304,7 @@ SKIP: {
     testExtID(
       "Devel::Ladybug::PgSQL::ExtIDTest",
       {
-        __useDbi  => true,
-        __dbiType => 2
+        __useDbi => 3
       }
     ),
     "ExtID support for PostgreSQL"
