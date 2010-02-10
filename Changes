@@ -1,6 +1,6 @@
 .409
-  - Add debugging to Ladybug.t to help diagnose platform issues
-  - Consolidated backing store type enumerations into StorageType.pm
+  - Add debugging + search tests to Ladybug.t
+  - Consolidate backing store type enums into StorageType.pm
 
 .408
   - Misc minor bug and doc fixes

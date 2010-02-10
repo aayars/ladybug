@@ -364,7 +364,7 @@ sub kickClassTires {
 
     ok( $ids = $class->search($query), "Full-text search" );
 
-    ok( $ids && $ids->count > 0, "Greater than 0 hits returned" );
+    ok( $ids && $ids->count > 0, "Search hit count is > 0" );
 
     if ( $ids ) {
       $ids->each( sub {
