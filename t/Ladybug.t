@@ -59,7 +59,7 @@ do {
   %instancePrototype = (
     testArray    => [ "foo", "bar", "baz", "rebar", "rebaz" ],
     testBool     => true,
-    testDouble   => 1234.5678901,
+    testDouble   => 3.14159265,
     testFloat    => 3.14159265,
     testInt      => 23,
     testNum      => 42,
