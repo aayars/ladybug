@@ -54,8 +54,8 @@ sub members {
 
 =item * $class->membersHash()
 
-Return an Devel::Ladybug::Hash containing the CODE refs of all valid messages in
-this class, keyed on message (symbol) name.
+Return an Devel::Ladybug::Hash containing the CODE refs of all valid
+messages in this class, keyed on message (symbol) name.
 
 =cut
 
@@ -70,11 +70,8 @@ sub membersHash {
 
 =item * $class->asserts()
 
-Returns the Devel::Ladybug::Hash of attribute assertions for this class, including
-any base assertions which may be present.
-
-Overrides the abstract method from Devel::Ladybug::Class with a concrete implementation
-for non-abstract classes.
+Returns all assertions for this class, including those which were
+inherited.
 
   my $asserts = $class->asserts();
 
