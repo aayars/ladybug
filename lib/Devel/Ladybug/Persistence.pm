@@ -1486,68 +1486,6 @@ sub __supportsPostgreSQL {
 
 =pod
 
-=item * $class->__baseAsserts()
-
-Assert base-level inherited assertions for objects. These include: id,
-name, mtime, ctime.
-
-  __baseAsserts => sub($) {
-    my $class = shift;
-
-    my $base = $class->SUPER::__baseAsserts();
-
-    $base->{parentId} = Devel::Ladybug::Str->assert();
-
-    return Clone::clone( $base );
-  }
-
-=cut
-
-sub __baseAsserts {
-  my $class = shift;
-
-  my @dtArgs;
-
-  if ( $class->get("__useDbi") ) {
-    @dtArgs = ( columnType => $class->__datetimeColumnType() );
-  }
-
-  my $asserts = $class->get("__baseAsserts");
-
-  if ( !defined $asserts ) {
-    $asserts = Devel::Ladybug::Hash->new(
-      id => Devel::Ladybug::ID->assert(
-        Devel::Ladybug::Type::subtype(
-          descript => "The primary GUID key of this object"
-        )
-      ),
-      name => Devel::Ladybug::Name->assert(
-        Devel::Ladybug::Type::subtype(
-          descript => "A human-readable secondary key for this object",
-        )
-      ),
-      mtime => Devel::Ladybug::DateTime->assert(
-        Devel::Ladybug::Type::subtype(
-          descript => "The last modified timestamp of this object",
-          @dtArgs
-        )
-      ),
-      ctime => Devel::Ladybug::DateTime->assert(
-        Devel::Ladybug::Type::subtype(
-          descript => "The creation timestamp of this object",
-          @dtArgs
-        )
-      ),
-    );
-
-    $class->set( "__baseAsserts", $asserts );
-  }
-
-  return ( clone $asserts );
-}
-
-=pod
-
 =item * $class->__basePath()
 
 Return the base filesystem path used to store objects of the current
@@ -1613,7 +1551,7 @@ sub __primaryKey {
   my $key = $class->get("__primaryKey");
 
   if ( !defined $key ) {
-    $key = DefaultPrimaryKey;
+    $key = Devel::Ladybug::Persistence::DefaultPrimaryKey;
 
     $class->set( "__primaryKey", $key );
   }
@@ -2540,9 +2478,6 @@ sub __elementClass {
   my $elementClass;
 
   if ($type) {
-    my $base = $class->__baseAsserts();
-    delete $base->{name};
-
     if ( $type->objectClass()->isa('Devel::Ladybug::Array') ) {
       $elementClass = join( "::", $class, $key );
 

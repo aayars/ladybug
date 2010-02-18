@@ -51,11 +51,63 @@ sub new {
   return $self;
 }
 
-sub save {
-  my $self = shift;
-  my @args = @_;
+sub __baseAsserts {
+  my $class = shift;
 
-  $self->SUPER::save(@args);
+  my @dtArgs;
+
+  if ( $class->get("__useDbi") ) {
+    @dtArgs = ( columnType => $class->__datetimeColumnType() );
+  }
+
+  my $asserts = $class->get("__baseAsserts");
+
+  if ( !$asserts ) {
+    if ( $class eq 'Devel::Ladybug::Node' ) {
+      $asserts = Devel::Ladybug::Hash->new(
+        id => Devel::Ladybug::ID->assert(
+          Devel::Ladybug::Type::subtype(
+            descript => "The primary GUID key of this object"
+          )
+        ),
+        name => Devel::Ladybug::Name->assert(
+          Devel::Ladybug::Type::subtype(
+            descript => "A human-readable secondary key for this object",
+          )
+        ),
+        mtime => Devel::Ladybug::DateTime->assert(
+          Devel::Ladybug::Type::subtype(
+            descript => "The last modified timestamp of this object",
+            @dtArgs
+          )
+        ),
+        ctime => Devel::Ladybug::DateTime->assert(
+          Devel::Ladybug::Type::subtype(
+            descript => "The creation timestamp of this object",
+            @dtArgs
+          )
+        ),
+      );
+    } else {
+      $asserts = Devel::Ladybug::Hash->new;
+
+      for my $super ( $class->SUPER ) {
+        next if !$super->can("asserts");
+
+        my $theseAsserts = $super->asserts || next;
+
+        $theseAsserts->each( sub {
+          my $key = shift;
+
+          $asserts->{$key} = $theseAsserts->{$key};
+        } );
+      }
+    }
+
+    $class->set( "__baseAsserts", $asserts );
+  }
+
+  return ( clone $asserts );
 }
 
 =pod

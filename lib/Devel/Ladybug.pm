@@ -11,7 +11,7 @@
 
 package Devel::Ladybug;
 
-our $VERSION = '0.410';
+our $VERSION = '0.411';
 
 use strict;
 use diagnostics;
@@ -111,13 +111,13 @@ RCS may be used in conjunction with the permanent backing store.
 
 =head1 VERSION
 
-This documentation is for version B<0.410> of Devel::Ladybug.
+This documentation is for version B<0.411> of Devel::Ladybug.
 
 =head1 FRAMEWORK ASSUMPTIONS
 
 As with any framework, a number of things "just happen" by design.
-Trying to go against the flow of any of these base assumptions is
-not recommended.
+Trying to go against the flow of these base assumptions is not
+recommended.
 
 =head2 Configuration
 

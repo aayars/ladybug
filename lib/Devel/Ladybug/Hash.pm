@@ -337,11 +337,11 @@ which are always either true or false:
   use YourApp::Example;
 
   create "YourApp::Example::BoolAttrib" => {
-    exampleId => Devel::Ladybug::ExtId->assert( "YourApp::Example" ),
+    exampleId => YourApp::Example->assert,
 
-    elementKey => Devel::Ladybug::Str->assert( ),
+    elementKey => Devel::Ladybug::Str->assert,
 
-    elementValue => Devel::Ladybug::Bool->assert( ),
+    elementValue => Devel::Ladybug::Bool->assert,
   };
   
 =head1 SEE ALSO

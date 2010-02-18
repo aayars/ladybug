@@ -100,66 +100,8 @@ sub asserts {
 
 =item * $class->__baseAsserts()
 
-Returns a clone of the Devel::Ladybug::Hash of base assertions for this class.
-Types are not inherited by subclasses, unless defined in the hash
-returned by this method. Override in subclass to provide a hash of
-inherited assertions.
-
-Unless implementing a new abstract class that uses special keys,
-__baseAsserts() does not need to be used or modified. Concrete classes
-should just use inline assertions as per the examples in L<Devel::Ladybug::Type>.
-
-C<__baseAsserts()> may be overridden as a C<sub{}> or as a class variable.
-
-Using a C<sub{}> lets you extend the parent class's base asserts, or use
-any other Perl operation to derive the appropriate values:
-
-  create "YourApp::Example" => {
-    #
-    # Inherit parent class's base asserts, tack on "foo"
-    #
-    __baseAsserts => sub {
-      my $class = shift;
-
-      my $base = $class->SUPER::__baseAsserts();
-
-      $base->{foo} = Devel::Ladybug::Str->assert();
-
-      return $base;
-    },
-
-    # ...
-  };
-
-One may alternately use a class variable to redefine base asserts,
-overriding the parent:
-
-  create "YourApp::Example" => {
-    #
-    # Statically assert two base attributes, "id" and "name"
-    #
-    __baseAsserts => {
-      id   => Devel::Ladybug::Int->assert(),
-
-      name => Devel::Ladybug::Str->assert()
-    },
-
-    # ...
-  }
-
-To inherit no base assertions:
-
-  create "Devel::Ladybug::RebelExample" => {
-    #
-    # Sometimes, parent doesn't know best:
-    #
-    __baseAsserts => { },
-
-    # ...
-  }
-
-Overrides the abstract method from Devel::Ladybug::Class with a concrete implementation
-for non-abstract classes.
+Returns the assertions which were inherited from the current class's
+superclass.
 
 =cut
 
@@ -170,6 +112,18 @@ sub __baseAsserts {
 
   if ( !defined $asserts ) {
     $asserts = Devel::Ladybug::Hash->new();
+
+    for my $super ( $class->SUPER ) {
+      next if !$super->isa("Devel::Ladybug::Object") || !$super->can("asserts");
+
+      my $theseAsserts = $super->asserts || next;
+
+      $theseAsserts->each( sub {
+        my $key = shift;
+
+        $asserts->{$key} = $theseAsserts->{$key};
+      } );
+    }
 
     $class->set( "__baseAsserts", $asserts );
   }
