@@ -1712,10 +1712,10 @@ sub __marshal {
   #
   # Re-assemble complex structures using data from linked tables.
   #
-  # For arrays, "elementIndex" is the array index, and "elementValue"
+  # For arrays, "name" is the array index, and "elementValue"
   # is the actual element value. Each element is a row in the linked table.
   #
-  # For hashes, "elementKey" is the key, and "elementValue" is the value.
+  # For hashes, "name" is the key, and "elementValue" is the value.
   # Each key/value pair is a row in the linked table.
   #
   # The parent object is referenced by id in parentId.
@@ -1789,7 +1789,7 @@ sub __marshal {
 
             $element = $elementClass->__marshal($element);
 
-            $hash->{ $element->elementKey() } = $element->elementValue();
+            $hash->{ $element->name() } = $element->elementValue();
           }
 
           $sth->finish();
@@ -2484,11 +2484,12 @@ sub __elementClass {
       create $elementClass => {
         __useDbi => $class->__useDbi,
 
-        name => Devel::Ladybug::Name->assert(
-          Devel::Ladybug::Type::subtype( optional => true )
+        name => Devel::Ladybug::Int->assert(
+          Devel::Ladybug::Type::subtype(
+            unique => "parentId"
+          )
         ),
         parentId     => $class->assert,
-        elementIndex => Devel::Ladybug::Int->assert,
         elementValue => $type->memberType,
       };
 
@@ -2500,11 +2501,12 @@ sub __elementClass {
       create $elementClass => {
         __useDbi => $class->__useDbi,
 
-        name => Devel::Ladybug::Name->assert(
-          Devel::Ladybug::Type::subtype( optional => true )
+        name => Devel::Ladybug::Str->assert(
+          Devel::Ladybug::Type::subtype(
+            unique => "parentId"
+          )
         ),
         parentId     => $class->assert,
-        elementKey   => Devel::Ladybug::Str->assert,
         elementValue => Devel::Ladybug::Str->assert,
       };
     }
@@ -3117,8 +3119,8 @@ sub _localSaveInsideTransaction {
 
           for my $value ( @{ $self->{$key} } ) {
             my $element = $elementClass->new(
+              name         => $i,
               parentId     => $self->key(),
-              elementIndex => $i,
               elementValue => $value,
             );
 
@@ -3133,8 +3135,8 @@ sub _localSaveInsideTransaction {
             my $value = $self->{$key}->{$elementKey};
 
             my $element = $elementClass->new(
+              name         => $elementKey,
               parentId     => $self->key(),
-              elementKey   => $elementKey,
               elementValue => $value,
             );
 

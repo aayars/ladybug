@@ -65,27 +65,13 @@ sub __baseAsserts {
   if ( !$asserts ) {
     if ( $class eq 'Devel::Ladybug::Node' ) {
       $asserts = Devel::Ladybug::Hash->new(
-        id => Devel::Ladybug::ID->assert(
-          Devel::Ladybug::Type::subtype(
-            descript => "The primary GUID key of this object"
-          )
-        ),
-        name => Devel::Ladybug::Name->assert(
-          Devel::Ladybug::Type::subtype(
-            descript => "A human-readable secondary key for this object",
-          )
+        id    => Devel::Ladybug::ID->assert,
+        name  => Devel::Ladybug::Name->assert,
+        ctime => Devel::Ladybug::DateTime->assert(
+          Devel::Ladybug::Type::subtype( @dtArgs )
         ),
         mtime => Devel::Ladybug::DateTime->assert(
-          Devel::Ladybug::Type::subtype(
-            descript => "The last modified timestamp of this object",
-            @dtArgs
-          )
-        ),
-        ctime => Devel::Ladybug::DateTime->assert(
-          Devel::Ladybug::Type::subtype(
-            descript => "The creation timestamp of this object",
-            @dtArgs
-          )
+          Devel::Ladybug::Type::subtype( @dtArgs )
         ),
       );
     } else {
