@@ -2278,7 +2278,9 @@ sub __init {
     }
   }
 
-  if (!$alreadyWarnedForMemcached
+  if (
+    memcachedHosts
+    && !$alreadyWarnedForMemcached
     && $class->__useMemcached
     && ( !$memd || !%{ $memd->server_versions } ) )
   {
