@@ -103,8 +103,6 @@ use Devel::Ladybug::Name;
 
 use Devel::Ladybug::Type;
 
-use Devel::Ladybug::Redefines;
-
 #
 # RCS setup
 #
