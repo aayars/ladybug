@@ -1,7 +1,8 @@
 .412
-  - Minor decruft and "still works" release
+  - Minor decruft and "mostly still works" release
   - Don't warn about memcached if memcachedHosts is undef in the rc
-  - Redefines.pm removed; has not been needed for a long time
+  - Redefines.pm removed; this has not been needed for a long time
+  - Move warning about long double support to top level
 
 .411
   - "__init" Class callback was mis-documented as "init"
